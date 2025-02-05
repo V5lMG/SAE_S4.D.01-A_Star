@@ -62,7 +62,3 @@ def generation_plateau(largeur, longueur, taux_cases_interdite, depart_arrivee_a
     # Afficher ligne par ligne
     for ligne in plateau:
         print(" ".join(map(str, ligne)))
-
-
-# exemple d'utilisation
-generation_plateau(4, 10, 0.2, False)

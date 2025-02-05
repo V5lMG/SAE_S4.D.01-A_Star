@@ -1,4 +1,4 @@
-# import generation
+import generation
 
 def main():
     """
@@ -37,8 +37,8 @@ def main():
             # Choix de la Longueur du plateau par l'utilisateur
             while longueur < 3 :
                 print("""
-                    Vous venez de sélectionner la génération aléatoire d'un plateau de jeu.
-                    Veuillez entrer la \033[4mLongueur\033[0m du plateau de jeu (un entier est requis supérieur à 2).
+                Vous venez de sélectionner la génération aléatoire d'un plateau de jeu.
+                Veuillez entrer la \033[4mLongueur\033[0m du plateau de jeu (un entier est requis supérieur à 2).
                     """)
                 longueur = int(input().strip())
                 if longueur < 3 :
@@ -47,16 +47,16 @@ def main():
             # Choix de la Largeur du plateau par l'utilisateur
             while largeur < 3 :
                 print("""
-                    Veuillez entrer la \033[4mLargeur\033[0m du plateau de jeu (un entier est requis supérieur à 2).
+                Veuillez entrer la \033[4mLargeur\033[0m du plateau de jeu (un entier est requis supérieur à 2).
                     """)
                 largeur = int(input().strip())
                 if largeur < 3 :
                     print("Veuillez sélectionner une réponse correcte\n")
 
             # Choix du taux de case interdite du plateau par l'utilisateur
-            while 0 > taux > 100 :
+            while 0 > taux or taux > 100 :
                 print("""
-                    Veuillez entrer le \033[4mTaux\033[0m de case interdite du plateau de jeu (compris entre 0 et 100).
+                Veuillez entrer le \033[4mTaux\033[0m de case interdite du plateau de jeu (compris entre 0 et 100).
                     """)
                 taux = int(input().strip())
                 if 0 > taux > 100 :
@@ -79,7 +79,7 @@ def main():
                 placement_D_A = True
 
             taux = taux / 100
-            # generation.generation_plateau(largeur, longueur, taux, placement_D_A)
+            generation.generation_plateau(largeur, longueur, taux, placement_D_A)
         if choix == "I":
             print("""
                 Vous venez de sélectionner l'importation d'un plateau de jeu 
