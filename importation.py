@@ -52,5 +52,5 @@ def verification_plateau(plateau):
 
 
 # Exemple d'utilisation
-chemin = "test.txt"
-plateau = importer_plateau(chemin)
+#chemin = "test.txt"
+# plateau = importer_plateau(chemin)
