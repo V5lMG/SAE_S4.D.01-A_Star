@@ -79,6 +79,7 @@ def main():
                 placement_D_A = True
 
             taux = taux / 100
+            print("\n\n")
             generation.generation_plateau(largeur, longueur, taux, placement_D_A)
         if choix == "I":
             print("""
