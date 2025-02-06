@@ -16,10 +16,10 @@ def importer_plateau(chemin_fichier):
 
     # Vérification plateau
     if verification_plateau(plateau):
+        print("Le plateau a été importé avec succès !")
         # Affichage du plateau
-        print("Le plateau a été importé avec succès :")
-        for ligne in plateau:
-            print(" ".join(ligne))
+        # for ligne in plateau:
+        #     print(" ".join(ligne))
 
     # Pour lecture avec algorithme de Dijkstra
     return plateau
