@@ -3,7 +3,7 @@ def importer_plateau(chemin_fichier):
     # Lire le fichier et stocker les lignes
     try:
         with open(chemin_fichier, "r") as fichier:
-            plateau = [ligne.strip() for ligne in fichier]
+            plateau = [list(ligne.strip()) for ligne in fichier]
     except FileNotFoundError:
         print("Erreur : fichier introuvable.")
         return None
@@ -18,9 +18,11 @@ def importer_plateau(chemin_fichier):
         # Affichage du plateau
         print("Le plateau a été importé avec succès :")
         for ligne in plateau:
-            print(ligne)
+            print("".join(ligne))
 
-    return plateau # Pour lecture avec algorithme de Dijkstra
+    # Pour lecture avec algorithme de Dijkstra
+    return plateau
+
 
 # 2) Vérification du plateau
 def verification_plateau(plateau):
@@ -45,7 +47,7 @@ def verification_plateau(plateau):
     # Vérification des cases valides (X, O, D, A)
     for ligne in plateau:
         for case in ligne:
-            if case not in 'X ODA':  # Si un caractère n'est pas valide
+            if case not in 'XODA':  # Si un caractère n'est pas valide
                 print(f"Erreur : caractère non valide '{case}' trouvé dans le plateau.")
                 return False
 
