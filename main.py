@@ -83,7 +83,7 @@ def main():
             taux = taux / 100
             print("\n\n")
             plateau = generation.generation_plateau(largeur, longueur, taux, placement_D_A)
-            parcours.dijkstra(plateau)
+
         if choix == "I":
             print("""
                 Vous venez de sélectionner l'importation d'un plateau de jeu 
@@ -98,9 +98,12 @@ def main():
 
              # Appeler la méthode d'importation
             print("\n\n")
-            importation.importer_plateau(chemin_import)
+            plateau = importation.importer_plateau(chemin_import)
+
         if choix != "Q" and choix != "G" and choix != "I":
             print("""
                 Vous venez de saisir un mauvais caractères, vous avez le choix entre G, I et Q.""")
+
+        parcours.dijkstra(plateau)
 
 main()

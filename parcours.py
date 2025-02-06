@@ -1,7 +1,7 @@
 import generation
 
 # Représentation du plateau de jeu
-plateau = generation.generation_plateau(4, 8, 0.15, True)
+# plateau = generation.generation_plateau(4, 8, 0.15, True)
 
 # Contient les vecteurs de déplacement pour les 4 directions cardinales : droite, bas, gauche, haut
 directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]

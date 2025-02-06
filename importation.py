@@ -20,8 +20,7 @@ def importer_plateau(chemin_fichier):
         for ligne in plateau:
             print(ligne)
 
-    # Renvoyer le plateau pour l'algorithme
-    return plateau
+    return plateau # Pour lecture avec algorithme de Dijkstra
 
 # 2) Vérification du plateau
 def verification_plateau(plateau):
