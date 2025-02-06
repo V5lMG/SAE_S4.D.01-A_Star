@@ -112,4 +112,4 @@ def affichage_chemin(plateau, chemin, explorees):
         print(' '.join(ligne))
 
 # Exécution de l'algorithme
-dijkstra(plateau)
+# dijkstra(plateau)

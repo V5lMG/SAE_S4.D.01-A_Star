@@ -1,4 +1,5 @@
 import generation
+import parcours
 import importation
 
 def main():
@@ -81,7 +82,8 @@ def main():
 
             taux = taux / 100
             print("\n\n")
-            generation.generation_plateau(largeur, longueur, taux, placement_D_A)
+            plateau = generation.generation_plateau(largeur, longueur, taux, placement_D_A)
+            parcours.dijkstra(plateau)
         if choix == "I":
             print("""
                 Vous venez de sélectionner l'importation d'un plateau de jeu 
