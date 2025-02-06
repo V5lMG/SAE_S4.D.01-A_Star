@@ -1,4 +1,3 @@
-import heapq
 import generation
 
 # Représentation du plateau de jeu
@@ -51,7 +50,11 @@ def dijkstra(plateau):
     explorees = {debut}
 
     while case_prioritaire:
-        distance_actuelle, (x, y) = heapq.heappop(case_prioritaire)
+        # Trie la liste en fonction de la priorité
+        case_prioritaire.sort()
+
+        # Récupère l'élément avec la plus petite priorité
+        distance_actuelle, (x, y) = case_prioritaire.pop(0)
 
         # Si nous avons atteint l'arrivée, on sort de la boucle
         if (x, y) == fin:
@@ -67,7 +70,10 @@ def dijkstra(plateau):
                     distances[nouveau_x][nouveau_y] = nouvelle_distance
 
                     # Ajoute la distance et les coordonnées dans le tableau des priorités
-                    heapq.heappush(case_prioritaire, (nouvelle_distance, (nouveau_x, nouveau_y)))
+                    case_prioritaire.append((nouvelle_distance, (nouveau_x, nouveau_y)))
+
+                    # Trie la liste pour maintenir l'ordre de priorité
+                    case_prioritaire.sort()
 
                     # Récupère les coordonnées pour retracer le chemin
                     precedente[(nouveau_x, nouveau_y)] = (x, y)

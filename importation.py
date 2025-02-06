@@ -20,6 +20,9 @@ def importer_plateau(chemin_fichier):
         for ligne in plateau:
             print(ligne)
 
+    # Renvoyer le plateau pour l'algorithme
+    return plateau
+
 # 2) Vérification du plateau
 def verification_plateau(plateau):
     # Vérification que le plateau est rectangulaire
