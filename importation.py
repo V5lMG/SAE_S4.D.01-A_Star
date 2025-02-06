@@ -3,7 +3,8 @@ def importer_plateau(chemin_fichier):
     # Lire le fichier et stocker les lignes
     try:
         with open(chemin_fichier, "r") as fichier:
-            plateau = [list(ligne.strip()) for ligne in fichier]
+            # Enlever les espaces
+            plateau = [list(ligne.strip().replace(" ", "")) for ligne in fichier]
     except FileNotFoundError:
         print("Erreur : fichier introuvable.")
         return None
@@ -18,7 +19,7 @@ def importer_plateau(chemin_fichier):
         # Affichage du plateau
         print("Le plateau a été importé avec succès :")
         for ligne in plateau:
-            print("".join(ligne))
+            print(" ".join(ligne))
 
     # Pour lecture avec algorithme de Dijkstra
     return plateau
@@ -56,5 +57,5 @@ def verification_plateau(plateau):
 
 
 # Exemple d'utilisation
-#chemin = "test.txt"
+# chemin = "test.txt"
 # plateau = importer_plateau(chemin)

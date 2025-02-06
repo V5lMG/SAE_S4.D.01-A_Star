@@ -96,10 +96,10 @@ def main():
                 print("Veuillez saisir un chemin valide :")
                 chemin_import = input().strip()
 
-             # Appeler la méthode d'importation
+            # Appeler la méthode d'importation
             print("\n\n")
             plateau = importation.importer_plateau(chemin_import)
-
+            print()
         if choix != "Q" and choix != "G" and choix != "I":
             print("""
                 Vous venez de saisir un mauvais caractères, vous avez le choix entre G, I et Q.""")
