@@ -6,15 +6,15 @@ def main():
     """
     Afficher le menu principal et permettre à l'utilisateur de choisir une option (Génération, Importation, Quitter).
     - Si l'utilisateur choisit "G" (Génération d'un plateau de jeu) :
-        - Demander la longueur du plateau (doit être supérieure ou égal à 3).
-        - Demander la largeur du plateau (doit être supérieure ou égal à 3).
+        - Demander la longueur du plateau (doit être supérieure ou égale à 3).
+        - Demander la largeur du plateau (doit être supérieure ou égale à 3).
         - Demander le taux de cases interdites (doit être compris entre 0 et 100).
         - Demander si l'utilisateur souhaite positionner les cases départ et arrivée automatiquement.
         - Utiliser ces informations pour générer le plateau.
     - Si l'utilisateur choisit "I" (Importation d'un plateau de jeu) :
         - Demander le chemin du fichier à importer (doit être au format .txt).
         - Valider que le fichier se termine bien par ".txt".
-    - Si l'utilisateur saisit une option invalide, afficher un message d'erreur et lui redemande uneoption.
+    - Si l'utilisateur saisit une option invalide, afficher un message d'erreur et lui redemande une option.
     - Quitter l'application si l'utilisateur choisit "Q".
     :return:
     """
@@ -90,7 +90,7 @@ def main():
                 Veuillez saisir le chemin de votre fichier en .txt :""")
             chemin_import = input().strip()
 
-            # Tant que le chemin ne termine pas par ".txt"
+            # Tant que le chemin ne termine pas par ".txt".
             while not chemin_import.endswith(".txt"):
                 print("Erreur : le fichier doit être au format .txt.")
                 print("Veuillez saisir un chemin valide :")
