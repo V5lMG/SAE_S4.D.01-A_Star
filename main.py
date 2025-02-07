@@ -1,20 +1,21 @@
 import generation
 import parcours
 import importation
+import exportation
 
 def main():
     """
     Afficher le menu principal et permettre à l'utilisateur de choisir une option (Génération, Importation, Quitter).
     - Si l'utilisateur choisit "G" (Génération d'un plateau de jeu) :
-        - Demander la longueur du plateau (doit être supérieure ou égale à 3).
-        - Demander la largeur du plateau (doit être supérieure ou égale à 3).
+        - Demander la longueur du plateau (doit être supérieure ou égal à 3).
+        - Demander la largeur du plateau (doit être supérieure ou égal à 3).
         - Demander le taux de cases interdites (doit être compris entre 0 et 100).
         - Demander si l'utilisateur souhaite positionner les cases départ et arrivée automatiquement.
         - Utiliser ces informations pour générer le plateau.
     - Si l'utilisateur choisit "I" (Importation d'un plateau de jeu) :
         - Demander le chemin du fichier à importer (doit être au format .txt).
         - Valider que le fichier se termine bien par ".txt".
-    - Si l'utilisateur saisit une option invalide, afficher un message d'erreur et lui redemande une option.
+    - Si l'utilisateur saisit une option invalide, afficher un message d'erreur et lui redemande uneoption.
     - Quitter l'application si l'utilisateur choisit "Q".
     :return:
     """
@@ -82,7 +83,20 @@ def main():
 
             taux = taux / 100
             print("\n\n")
-            plateau = generation.generation_plateau(largeur, longueur, taux, placement_D_A)
+
+            # Générer un plateau vide
+            plateau_defaut = generation.generation_plateau(largeur, longueur, taux, placement_D_A)
+
+            # Récupérer les chemins à l'aide de dijkstra
+            chemin, explorees = parcours.dijkstra(plateau_defaut)
+
+            # Affichage de tous les plateaux
+            plateau_avec_chemin = parcours.affichage_chemin(plateau_defaut, chemin, explorees)
+
+            print("\n")
+            print("Sélectionner un nom de fichier : ")
+            nom_fichier = input().strip()
+            exportation.exporter_vers_txt(plateau_defaut, plateau_avec_chemin, nom_fichier)
 
         if choix == "I":
             print("""
@@ -90,20 +104,17 @@ def main():
                 Veuillez saisir le chemin de votre fichier en .txt :""")
             chemin_import = input().strip()
 
-            # Tant que le chemin ne termine pas par ".txt".
+            # Tant que le chemin ne termine pas par ".txt"
             while not chemin_import.endswith(".txt"):
                 print("Erreur : le fichier doit être au format .txt.")
                 print("Veuillez saisir un chemin valide :")
                 chemin_import = input().strip()
 
-            # Appeler la méthode d'importation
+             # Appeler la méthode d'importation
             print("\n\n")
-            plateau = importation.importer_plateau(chemin_import)
-            print()
+            importation.importer_plateau(chemin_import)
         if choix != "Q" and choix != "G" and choix != "I":
             print("""
                 Vous venez de saisir un mauvais caractères, vous avez le choix entre G, I et Q.""")
-
-        parcours.dijkstra(plateau)
 
 main()

@@ -1,5 +1,3 @@
-import generation
-
 # Représentation du plateau de jeu
 # plateau = generation.generation_plateau(4, 8, 0.15, True)
 
@@ -89,8 +87,8 @@ def dijkstra(plateau):
     # Inversion du chemin pour qu'il parte de 'D' à 'A'
     chemin = chemin[::-1]
 
-    # Affichage de tous les plateaux
-    affichage_chemin(plateau, chemin, explorees)
+    return chemin, explorees
+
 
 # Affichage du plateau avec les explorations (.) et le chemin (*)
 def affichage_chemin(plateau, chemin, explorees):
@@ -116,6 +114,9 @@ def affichage_chemin(plateau, chemin, explorees):
     print("Plateau avec le chemin trouvé par Dijkstra :")
     for ligne in plateau_avec_chemin:
         print(' '.join(ligne))
+
+    return plateau_avec_chemin
+
 
 # Exécution de l'algorithme
 # dijkstra(plateau)
