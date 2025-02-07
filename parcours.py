@@ -1,3 +1,5 @@
+import generation
+
 # Représentation du plateau de jeu
 # plateau = generation.generation_plateau(4, 8, 0.15, True)
 
@@ -93,16 +95,18 @@ def dijkstra(plateau):
 # Affichage du plateau avec les explorations (.) et le chemin (*)
 def affichage_chemin(plateau, chemin, explorees):
     plateau_avec_chemin = [ligne[:] for ligne in plateau]  # Copie du plateau original
+    nbr_cases_visitees = 0
 
     # Marquer les cases explorées par des points (.) uniquement si elles ont été réellement atteintes
     for (x, y) in explorees:
         if plateau_avec_chemin[x][y] == 'O':  # Marquer uniquement les cases atteignables
-            plateau_avec_chemin[x][y] = '.'
+            plateau_avec_chemin[x][y] = '*'
+            nbr_cases_visitees = nbr_cases_visitees + 1
 
     # Marquer le chemin avec des étoiles (*)
     for (x, y) in chemin:
         if plateau_avec_chemin[x][y] not in ['D', 'A']:
-            plateau_avec_chemin[x][y] = '*'
+            plateau_avec_chemin[x][y] = '.'
 
     # Affichage du plateau de départ
     print("Plateau de départ :")
@@ -117,6 +121,8 @@ def affichage_chemin(plateau, chemin, explorees):
 
     return plateau_avec_chemin
 
+
+    return nbr_cases_visitees
 
 # Exécution de l'algorithme
 # dijkstra(plateau)

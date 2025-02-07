@@ -2,7 +2,7 @@
 def importer_plateau(chemin_fichier):
     # Lire le fichier et stocker les lignes
     try:
-        with open(chemin_fichier, "r") as fichier:
+        with open(chemin_fichier, "r " ) as fichier:
             # Enlever les espaces
             plateau = [list(ligne.strip().replace(" ", "")) for ligne in fichier]
     except FileNotFoundError:
