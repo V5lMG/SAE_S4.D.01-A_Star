@@ -24,7 +24,6 @@ def importer_plateau(chemin_fichier):
     # Pour lecture avec algorithme de Dijkstra
     return plateau
 
-
 # 2) Vérification du plateau
 def verification_plateau(plateau):
     # Vérification que le plateau est rectangulaire

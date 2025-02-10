@@ -88,25 +88,27 @@ def dijkstra(plateau):
 
     # Inversion du chemin pour qu'il parte de 'D' à 'A'
     chemin = chemin[::-1]
-
     return chemin, explorees
 
 
-# Affichage du plateau avec les explorations (.) et le chemin (*)
-def affichage_chemin(plateau, chemin, explorees):
+# Affichage du plateau avec les explorations (*) et le chemin (.)
+def affichage_chemin(plateau, chemin, explorees, choix):
     plateau_avec_chemin = [ligne[:] for ligne in plateau]  # Copie du plateau original
     nbr_cases_visitees = 0
 
-    # Marquer les cases explorées par des points (.) uniquement si elles ont été réellement atteintes
+    # Marquer les cases explorées par des points (*) uniquement si elles ont été réellement atteintes
     for (x, y) in explorees:
         if plateau_avec_chemin[x][y] == 'O':  # Marquer uniquement les cases atteignables
             plateau_avec_chemin[x][y] = '*'
             nbr_cases_visitees = nbr_cases_visitees + 1
 
-    # Marquer le chemin avec des étoiles (*)
+    # Marquer le chemin avec des étoiles (.)
     for (x, y) in chemin:
         if plateau_avec_chemin[x][y] not in ['D', 'A']:
             plateau_avec_chemin[x][y] = '.'
+
+    if choix == "C":
+        return plateau_avec_chemin, nbr_cases_visitees
 
     # Affichage du plateau de départ
     print("Plateau de départ :")
@@ -119,10 +121,7 @@ def affichage_chemin(plateau, chemin, explorees):
     for ligne in plateau_avec_chemin:
         print(' '.join(ligne))
 
-    return plateau_avec_chemin
-
-
-    return nbr_cases_visitees
+    return plateau_avec_chemin, nbr_cases_visitees
 
 # Exécution de l'algorithme
 # dijkstra(plateau)

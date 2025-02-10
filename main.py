@@ -2,6 +2,7 @@ import generation
 import parcours
 import importation
 import exportation
+import comparaison
 
 def main():
     """
@@ -25,13 +26,13 @@ def main():
                 Bienvenue sur notre application d'analyse de l'algorithme Dijkstra et A* !
                 Veuillez saisir la lettre correspondante à l'action que vous voulez réaliser :
                     G - Génération d'un plateau de jeu
+                    C - Comparaison d'algorithme
                     I - Importation d'un plateau de jeu existant (.txt)
                     Q - Quitter l'application\n\n
               """)
         choix = input().strip().upper()
 
-        if choix == "G":
-
+        if choix == "G" :
             # Initialisation
             longueur = largeur = 0
             taux = -1
@@ -91,13 +92,19 @@ def main():
             chemin, explorees = parcours.dijkstra(plateau_defaut)
 
             # Affichage de tous les plateaux
-            plateau_avec_chemin = parcours.affichage_chemin(plateau_defaut, chemin, explorees)
+            plateau_avec_chemin = parcours.affichage_chemin(plateau_defaut, chemin, explorees, choix)
 
             print("\n")
             print("Sélectionner un nom de fichier : ")
-            nom_fichier = input().strip()
+            nom_fichier = str(input().strip()) # TODO revoir
             exportation.exporter_vers_txt(plateau_defaut, plateau_avec_chemin, nom_fichier)
 
+        # Comparaison d'algorithme
+        if choix == "C":
+            print("Le lancement de la comparaison est en cours ...")
+            comparaison.comparaison(choix)
+
+        # Importation d'un plateau
         if choix == "I":
             print("""
                 Vous venez de sélectionner l'importation d'un plateau de jeu 
@@ -113,7 +120,7 @@ def main():
              # Appeler la méthode d'importation
             print("\n\n")
             importation.importer_plateau(chemin_import)
-        if choix != "Q" and choix != "G" and choix != "I":
+        if choix != "Q" and choix != "G" and choix != "I" and choix != "C":
             print("""
                 Vous venez de saisir un mauvais caractères, vous avez le choix entre G, I et Q.""")
 
