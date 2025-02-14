@@ -1,13 +1,11 @@
 from heapq import heappop, heappush
 from plateau import Plateau
-import generation
 import math
-
 
 class Dijkstra:
     """Implémentation de l'algorithme de Dijkstra pour trouver le plus court chemin sur un plateau."""
 
-    def __init__(self, plateau):
+    def __init__(self, plateau,):
         """
         Initialise l'algorithme avec un plateau.
         :param plateau: Objet Plateau contenant la grille de jeu.
@@ -38,21 +36,12 @@ class Dijkstra:
         return (0 <= x < self.plateau.largeur
                 and 0 <= y < self.plateau.longueur
                 and not self.plateau.grille[x][y].est_interdite())
-# Vérifier si une case est valide pour être explorée,
-# C'est-à-dire qu'elle est à l'intérieur des limites du plateau, qu'elle n'est pas un obstacle (X),
-# ni déjà marquée dans le chemin (*).
-def est_valide(plateau, x, y):
-    return      (0 <= x < len(plateau)         # Si l'abscisse (x) est dans le plateau
-            and 0 <= y < len(plateau[0])       # Si l'ordonnée (x) est dans le plateau
-            and plateau[x][y] not in ['X'])    # Vérifie que la case n'est pas un mur (X)
 
-# Calcul de la distance heuristique
-def heuristique(a, b):
-    return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
-
-# Algorithme de Dijkstra
-def dijkstra(plateau):
-    debut, fin = trouver_debut_fin(plateau)
+    def heuristique(a, b):
+        """
+        Calcul de la distance heuristique en vol d'oiseau
+        """
+        return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
     def executer(self):
         """Exécute l'algorithme de Dijkstra pour trouver le chemin le plus court."""
@@ -90,68 +79,6 @@ def dijkstra(plateau):
         # Reconstruire le chemin le plus court
         self.chemin = self.reconstruire_chemin()
         return self.chemin, self.explorees
-                    # Trie la liste pour maintenir l'ordre de priorité
-                    case_prioritaire.sort()
-
-                    # Récupère les coordonnées pour retracer le chemin
-                    precedente[(nouveau_x, nouveau_y)] = (x, y)
-                    explorees.add((nouveau_x, nouveau_y))  # Marquer la case comme explorée
-
-    # Recréation du chemin le plus court en partant de la fin
-    chemin = []
-    actuel = fin
-    while actuel:
-        chemin.append(actuel)
-        actuel = precedente.get(actuel)
-
-    # Inversion du chemin pour qu'il parte de 'D' à 'A'
-    chemin = chemin[::-1]
-    return chemin, explorees
-
-# Algorithme de A*
-def a_star(plateau):
-    debut, fin = trouver_debut_fin(plateau)
-
-    # Création de la liste des distances avec des valeurs infinies
-    distances = [[float('inf')] * len(plateau[0]) for _ in range(len(plateau))]
-    distances[debut[0]][debut[1]] = 0
-
-    # File de case de priorité pour explorer les cases avec la plus petite distance en premier
-    case_prioritaire = [(0, debut)]  # Seulement la case de départ pour initialisation
-
-    # Dictionnaire pour retracer le chemin une fois l'arrivée atteinte
-    precedente = {debut: None}
-
-    # Ensemble pour stocker les cases réellement explorées
-    explorees = {debut}
-
-    while case_prioritaire:
-        # Trie la liste en fonction de la priorité (distance + heuristique)
-        case_prioritaire.sort()
-
-        # Récupère l'élément avec la plus petite priorité
-        distance_actuelle, (x, y) = case_prioritaire.pop(0)
-
-        # Si nous avons atteint l'arrivée, on sort de la boucle
-        if (x, y) == fin:
-            break
-
-        # Exploration des voisins (droite, bas, gauche, haut)
-        for dx, dy in directions:
-            nouveau_x, nouveau_y = x + dx, y + dy
-
-            if est_valide(plateau, nouveau_x, nouveau_y) and (nouveau_x, nouveau_y) not in explorees:
-                nouvelle_distance = distance_actuelle + 1
-
-                if nouvelle_distance < distances[nouveau_x][nouveau_y]:
-                    distances[nouveau_x][nouveau_y] = nouvelle_distance
-
-                    # Ajoute la distance, l'heuristique et les coordonnées dans le tableau des priorités
-                    priorite = heuristique((nouveau_x, nouveau_y), fin)
-                    case_prioritaire.append((priorite, (nouveau_x, nouveau_y)))
-
-                    # Trie la liste pour maintenir l'ordre de priorité
-                    case_prioritaire.sort()
 
     def reconstruire_chemin(self):
         """Recrée le chemin à partir des précédents."""
@@ -184,7 +111,6 @@ def a_star(plateau):
 
         return grille_affichage
 
-
 # Test
 if __name__ == "__main__":
     # Création d'un plateau pour tester
@@ -194,3 +120,49 @@ if __name__ == "__main__":
     algo = Dijkstra(plateau_test)
     chemin, explorees = algo.executer()
     algo.afficher_resultat()
+
+
+# Algorithme de A*
+# def a_star(plateau):
+#     debut, fin = trouver_debut_fin(plateau)
+#
+#     # Création de la liste des distances avec des valeurs infinies
+#     distances = [[float('inf')] * len(plateau[0]) for _ in range(len(plateau))]
+#     distances[debut[0]][debut[1]] = 0
+#
+#     # File de case de priorité pour explorer les cases avec la plus petite distance en premier
+#     case_prioritaire = [(0, debut)]  # Seulement la case de départ pour initialisation
+#
+#     # Dictionnaire pour retracer le chemin une fois l'arrivée atteinte
+#     precedente = {debut: None}
+#
+#     # Ensemble pour stocker les cases réellement explorées
+#     explorees = {debut}
+#
+#     while case_prioritaire:
+#         # Trie la liste en fonction de la priorité (distance + heuristique)
+#         case_prioritaire.sort()
+#
+#         # Récupère l'élément avec la plus petite priorité
+#         distance_actuelle, (x, y) = case_prioritaire.pop(0)
+#
+#         # Si nous avons atteint l'arrivée, on sort de la boucle
+#         if (x, y) == fin:
+#             break
+#
+#         # Exploration des voisins (droite, bas, gauche, haut)
+#         for dx, dy in directions:
+#             nouveau_x, nouveau_y = x + dx, y + dy
+#
+#             if est_valide(plateau, nouveau_x, nouveau_y) and (nouveau_x, nouveau_y) not in explorees:
+#                 nouvelle_distance = distance_actuelle + 1
+#
+#                 if nouvelle_distance < distances[nouveau_x][nouveau_y]:
+#                     distances[nouveau_x][nouveau_y] = nouvelle_distance
+#
+#                     # Ajoute la distance, l'heuristique et les coordonnées dans le tableau des priorités
+#                     priorite = heuristique((nouveau_x, nouveau_y), fin)
+#                     case_prioritaire.append((priorite, (nouveau_x, nouveau_y)))
+#
+#                     # Trie la liste pour maintenir l'ordre de priorité
+#                     case_prioritaire.sort()

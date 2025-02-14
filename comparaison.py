@@ -2,7 +2,6 @@
 # en abscisse le taux de cause interdite, en ordonnée le nombre de case visité
 
 import matplotlib.pyplot as plt
-import generation
 import parcours
 import time
 
@@ -26,16 +25,16 @@ def comparaison(choix):
 
         for j in range(50):
             # Génère un plateau identique pour les 2 algorithmes
-            plateau = generation.generation_plateau(50, 125, taux_cases_interdites[i]/100, True)
+            plateau = generation_plateau(50, 125, taux_cases_interdites[i]/100, True)
 
             # Récupérer les chemins à l'aide de dijkstra
             start = time.time()
-            chemin, explorees = parcours.dijkstra(plateau)
+            chemin, explorees = dijkstra(plateau)
             end = time.time()
             ecart = end - start
 
             # Affichage de tous les plateaux
-            plateau_avec_chemin, nbr_cases_visitees = parcours.affichage_chemin(plateau, chemin, explorees, choix)
+            plateau_avec_chemin, nbr_cases_visitees = affichage_chemin(plateau, chemin, explorees, choix)
 
             cases_visitees_Dijkstra.append(nbr_cases_visitees)
             temps_dijkstra.append(ecart)

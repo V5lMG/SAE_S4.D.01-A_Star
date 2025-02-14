@@ -48,10 +48,10 @@ class Application:
         self.plateau.afficher_plateau()
 
         # Exécution de l'algorithme de Dijkstra
-        chemin, explorees = parcours.Dijkstra(self.plateau)
+        dijkstra.Dijkstra(self.plateau)
 
         # Affichage du plateau avec le chemin
-        plateau_avec_chemin = parcours.affichage_chemin(self.plateau, chemin, explorees, "G")
+        plateau_avec_chemin = self.plateau.afficher_resultat()
 
         # Exportation du plateau
         nom_fichier = input("Entrez un nom de fichier pour exporter le plateau : ").strip()
