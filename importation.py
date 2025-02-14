@@ -1,60 +1,82 @@
-# 1) Importer le plateau
-def importer_plateau(chemin_fichier):
-    # Lire le fichier et stocker les lignes
-    try:
-        with open(chemin_fichier, "r " ) as fichier:
-            # Enlever les espaces
-            plateau = [list(ligne.strip().replace(" ", "")) for ligne in fichier]
-    except FileNotFoundError:
-        print("Erreur : fichier introuvable.")
-        return None
+from case import Case
+from plateau import Plateau
 
-    # Vérification simple : afficher un message si le fichier est vide
-    if not plateau:
-        print("Erreur : le fichier est vide.")
-        return None
 
-    # Vérification plateau
-    if verification_plateau(plateau):
-        print("Le plateau a été importé avec succès !")
-        # Affichage du plateau
-        # for ligne in plateau:
-        #     print(" ".join(ligne))
+class Importateur:
+    def __init__(self, fichier):
+        self.fichier = fichier
 
-    # Pour lecture avec algorithme de Dijkstra
-    return plateau
+    def importer_plateau(self):
+        """Lit un fichier et importe le plateau sous forme d'un objet Plateau avec ses cases."""
+        try:
+            with open(self.fichier, "r") as fichier:
+                lignes = [ligne.strip().replace(" ", "") for ligne in fichier]
+        except FileNotFoundError:
+            print(f"Erreur : fichier '{self.fichier}' introuvable.")
+            return None
 
-# 2) Vérification du plateau
-def verification_plateau(plateau):
-    # Vérification que le plateau est rectangulaire
-    longueur_ligne = len(plateau[0])  # Prendre la longueur de la première ligne
-    for ligne in plateau:
-        if len(ligne) != longueur_ligne:  # Si une ligne n'a pas la même longueur
+        if not lignes:
+            print("Erreur : le fichier est vide.")
+            return None
+
+        largeur = len(lignes)
+        longueur = len(lignes[0])
+
+        # Vérification que le plateau est bien rectangulaire
+        if any(len(ligne) != longueur for ligne in lignes):
             print("Erreur : le plateau n'est pas rectangulaire.")
-            return False
+            return None
 
-    # Vérification de l'unicité de 'D' (départ) et 'A' (arrivée)
-    nb_depart = sum(ligne.count('D') for ligne in plateau)
-    nb_arrivee = sum(ligne.count('A') for ligne in plateau)
+        # Création de l'objet Plateau
+        plateau = Plateau(largeur, longueur, 0, False)
+        cases = []
 
-    if nb_depart != 1:
-        print("Erreur : il doit y avoir un et un seul départ (D).")
-        return False
-    if nb_arrivee != 1:
-        print("Erreur : il doit y avoir une et une seule arrivée (A).")
-        return False
+        depart = None
+        arrivee = None
 
-    # Vérification des cases valides (X, O, D, A)
-    for ligne in plateau:
-        for case in ligne:
-            if case not in 'XODA':  # Si un caractère n'est pas valide
-                print(f"Erreur : caractère non valide '{case}' trouvé dans le plateau.")
-                return False
+        # Construction du plateau avec les objets Case
+        for x, ligne in enumerate(lignes):
+            row = []
+            for y, char in enumerate(ligne):
+                case_obj = Case(x, y, char)
+                row.append(case_obj)
 
-    # Si toutes les vérifications passent
-    return True
+                if char == 'D':
+                    if depart:
+                        print("Erreur : plusieurs points de départ détectés.")
+                        return None
+                    depart = case_obj
+
+                elif char == 'A':
+                    if arrivee:
+                        print("Erreur : plusieurs points d'arrivée détectés.")
+                        return None
+                    arrivee = case_obj
+
+            cases.append(row)
+
+        # Vérification de la présence unique de D et A
+        if not depart:
+            print("Erreur : aucun point de départ ('D') trouvé.")
+            return None
+        if not arrivee:
+            print("Erreur : aucun point d'arrivée ('A') trouvé.")
+            return None
+
+        # Mise à jour du plateau avec les cases importées
+        plateau.cases = cases
+        plateau.depart = depart
+        plateau.arrivee = arrivee
+
+        print("Le plateau a été importé avec succès !")
+        return plateau
 
 
-# Exemple d'utilisation
-# chemin = "test.txt"
-# plateau = importer_plateau(chemin)
+if __name__ == "__main__":
+    chemin_fichier = "test.txt"  # Remplace avec le chemin réel du fichier
+    importateur = Importateur(chemin_fichier)
+
+    plateau = importateur.importer_plateau()
+    if plateau:
+        print("Plateau importé :")
+        plateau.afficher_plateau()
