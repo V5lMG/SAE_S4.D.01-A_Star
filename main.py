@@ -1,6 +1,7 @@
 import parcours
 import importation
 import exportation
+from parcours import Dijkstra
 #import comparaison
 from plateau import Plateau
 
@@ -48,10 +49,10 @@ class Application:
         self.plateau.afficher_plateau()
 
         # Exécution de l'algorithme de Dijkstra
-        dijkstra.Dijkstra(self.plateau)
+        dijkstra = parcours.Dijkstra(self.plateau)
 
         # Affichage du plateau avec le chemin
-        plateau_avec_chemin = self.plateau.afficher_resultat()
+        plateau_avec_chemin = dijkstra.afficher_resultat()
 
         # Exportation du plateau
         nom_fichier = input("Entrez un nom de fichier pour exporter le plateau : ").strip()

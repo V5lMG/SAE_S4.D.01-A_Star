@@ -9,5 +9,11 @@ class Case:
     def est_traversable(self):
         return self.type_case != 'X'
 
+    def est_depart(self):
+        return self.type_case == "D"
+
+    def est_arrivee(self):
+        return self.type_case == "A"
+
     def __repr__(self):
         return self.type_case

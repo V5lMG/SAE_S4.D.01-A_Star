@@ -22,7 +22,7 @@ class Dijkstra:
         debut = fin = None
         for i in range(self.plateau.largeur):
             for j in range(self.plateau.longueur):
-                case = self.plateau.grille[i][j]
+                case = self.plateau.cases[i][j]
                 if case.est_depart():
                     debut = (i, j)
                 elif case.est_arrivee():
@@ -35,7 +35,7 @@ class Dijkstra:
         """
         return (0 <= x < self.plateau.largeur
                 and 0 <= y < self.plateau.longueur
-                and not self.plateau.grille[x][y].est_interdite())
+                and not self.plateau.cases[x][y].est_interdite())
 
     def heuristique(a, b):
         """
@@ -92,7 +92,7 @@ class Dijkstra:
     def afficher_resultat(self):
         """Affiche le plateau avec les cases explorées et le chemin."""
         print("\n🔍 **Plateau avec chemin trouvé par Dijkstra :**")
-        grille_affichage = [[case.get_type() for case in ligne] for ligne in self.plateau.grille]
+        grille_affichage = [[case.type_case for case in ligne] for ligne in self.plateau.cases]
 
         # Marquer les cases explorées
         for x, y in self.explorees:
