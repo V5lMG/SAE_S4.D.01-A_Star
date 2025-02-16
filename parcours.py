@@ -1,24 +1,28 @@
 from heapq import heappop, heappush
-from plateau import Plateau
 import math
 
-class Dijkstra:
-    """Implémentation de l'algorithme de Dijkstra pour trouver le plus court chemin sur un plateau."""
+from plateau import Plateau
 
-    def __init__(self, plateau,):
+
+class a_star:
+    """Implémente A* par défaut et bascule sur Dijkstra si nécessaire."""
+
+    def __init__(self, plateau, use_a_star=True):
         """
-        Initialise l'algorithme avec un plateau.
-        :param plateau: Objet Plateau contenant la grille de jeu.
+        Initialise l'algorithme.
+        :param plateau: Instance de Plateau.
+        :param use_a_star: Utiliser A* (True) ou Dijkstra (False).
         """
         self.plateau = plateau
+        self.use_a_star = use_a_star
         self.debut, self.fin = self.trouver_debut_fin()
-        self.distances = {}  # Stocke les distances minimales
-        self.precedents = {}  # Stocke les chemins parcourus
-        self.explorees = set()  # Cases explorées
-        self.chemin = []  # Stocke le chemin trouvé
+        self.distances = {}
+        self.precedents = {}
+        self.explorees = set()
+        self.chemin = []
 
     def trouver_debut_fin(self):
-        """Trouve les coordonnées de départ et d'arrivée dans le plateau."""
+        """Identifie les coordonnées du départ et de l'arrivée."""
         debut = fin = None
         for i in range(self.plateau.largeur):
             for j in range(self.plateau.longueur):
@@ -30,37 +34,39 @@ class Dijkstra:
         return debut, fin
 
     def est_valide(self, x, y):
-        """
-        Vérifie si une case est valide (dans les limites et non interdite).
-        """
+        """Vérifie si une case est dans les limites et traversable."""
         return (0 <= x < self.plateau.largeur
                 and 0 <= y < self.plateau.longueur
-                and not self.plateau.cases[x][y].est_interdite())
+                and self.plateau.cases[x][y].est_traversable())
 
-    def heuristique(a, b):
-        """
-        Calcul de la distance heuristique en vol d'oiseau
-        """
-        return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+    def heuristique(self, a, b):
+        """Retourne la distance heuristique entre deux points."""
+        if self.use_a_star:
+            # Calcul de l'heuristique
+            dist = math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+            print(f"Calcul heuristique entre {a} et {b} : {dist}")
+            return dist
+        else:
+            print(f"Heuristique non utilisée, retourne 0")
+            return 0
 
     def executer(self):
-        """Exécute l'algorithme de Dijkstra pour trouver le chemin le plus court."""
+        """Exécute A* ou Dijkstra selon la configuration."""
         if not self.debut or not self.fin:
-            print("❌ Impossible d'exécuter Dijkstra : départ ou arrivée manquants.")
+            print("Erreur : Départ ou arrivée introuvables.")
             return [], set()
 
-        # Initialisation des distances avec l'infini sauf pour la case de départ
-        self.distances = {(i, j): float('inf') for i in range(self.plateau.largeur) for j in range(self.plateau.longueur)}
+        # Initialisation des distances et de la file de priorité
+        self.distances = {(i, j): float('inf') for i in range(self.plateau.largeur) for j in
+                          range(self.plateau.longueur)}
         self.distances[self.debut] = 0
-
-        # File de priorité (tas) pour explorer les cases dans le bon ordre
         file_priorite = [(0, self.debut)]
         self.precedents[self.debut] = None
 
         while file_priorite:
-            distance_actuelle, (x, y) = heappop(file_priorite)
+            _, (x, y) = heappop(file_priorite)
 
-            # Si nous avons atteint l'arrivée, on arrête
+            # Si arrivée atteinte, on stoppe
             if (x, y) == self.fin:
                 break
 
@@ -68,30 +74,48 @@ class Dijkstra:
             for dx, dy in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
                 nx, ny = x + dx, y + dy
 
-                if self.est_valide(nx, ny) and (nx, ny) not in self.explorees:
-                    nouvelle_distance = distance_actuelle + 1
+                if self.est_valide(nx, ny):
+                    nouvelle_distance = self.distances[(x, y)] + 1
+
                     if nouvelle_distance < self.distances[(nx, ny)]:
                         self.distances[(nx, ny)] = nouvelle_distance
                         self.precedents[(nx, ny)] = (x, y)
-                        heappush(file_priorite, (nouvelle_distance, (nx, ny)))
-                        self.explorees.add((nx, ny))  # Marquer comme exploré
 
-        # Reconstruire le chemin le plus court
+                        # Vérification que les coordonnées sont valides avant d'appliquer l'heuristique
+                        if not (0 <= nx < self.plateau.largeur and 0 <= ny < self.plateau.longueur):
+                            print(f"Coordonnées invalides : ({nx}, {ny})")
+                            continue  # Ignore ces coordonnées invalides
+
+                        # Vérifier que `self.fin` contient des valeurs correctes
+                        if not (0 <= self.fin[0] < self.plateau.largeur and 0 <= self.fin[1] < self.plateau.longueur):
+                            print(f"Erreur : Arrivée (fin) hors limites : {self.fin}")
+                            return [], set()
+
+                        # Calcul de la priorité avec une heuristique (si A* est utilisé)
+                        try:
+                            priorite = nouvelle_distance + self.heuristique((nx, ny), self.fin)
+                        except ValueError as e:
+                            print(f"Erreur lors du calcul de l'heuristique : {e}")
+                            continue
+
+                        heappush(file_priorite, (priorite, (nx, ny)))
+                        self.explorees.add((nx, ny))
+
+        # Reconstruire le chemin
         self.chemin = self.reconstruire_chemin()
         return self.chemin, self.explorees
 
     def reconstruire_chemin(self):
-        """Recrée le chemin à partir des précédents."""
+        """Reconstruit le chemin optimal."""
         chemin = []
         actuel = self.fin
         while actuel:
             chemin.append(actuel)
             actuel = self.precedents.get(actuel)
-        return chemin[::-1]  # Inverser pour partir de D → A
+        return chemin[::-1]  # Inversé pour partir du départ
 
     def afficher_resultat(self):
-        """Affiche le plateau avec les cases explorées et le chemin."""
-        print("\n🔍 **Plateau avec chemin trouvé par Dijkstra :**")
+        """Affiche le plateau avec le chemin et les explorations."""
         grille_affichage = [[case.type_case for case in ligne] for ligne in self.plateau.cases]
 
         # Marquer les cases explorées
@@ -105,6 +129,7 @@ class Dijkstra:
                 grille_affichage[x][y] = "."
 
         # Affichage du plateau
+        print("\nPlateau avec chemin trouvé :")
         for ligne in grille_affichage:
             print(" ".join(ligne))
         print()
@@ -113,56 +138,12 @@ class Dijkstra:
 
 # Test
 if __name__ == "__main__":
-    # Création d'un plateau pour tester
-    plateau_test = Plateau(5, 7, 0.2, True)
-
-    # Lancer Dijkstra
-    algo = Dijkstra(plateau_test)
-    chemin, explorees = algo.executer()
-    algo.afficher_resultat()
-
-
-# Algorithme de A*
-# def a_star(plateau):
-#     debut, fin = trouver_debut_fin(plateau)
-#
-#     # Création de la liste des distances avec des valeurs infinies
-#     distances = [[float('inf')] * len(plateau[0]) for _ in range(len(plateau))]
-#     distances[debut[0]][debut[1]] = 0
-#
-#     # File de case de priorité pour explorer les cases avec la plus petite distance en premier
-#     case_prioritaire = [(0, debut)]  # Seulement la case de départ pour initialisation
-#
-#     # Dictionnaire pour retracer le chemin une fois l'arrivée atteinte
-#     precedente = {debut: None}
-#
-#     # Ensemble pour stocker les cases réellement explorées
-#     explorees = {debut}
-#
-#     while case_prioritaire:
-#         # Trie la liste en fonction de la priorité (distance + heuristique)
-#         case_prioritaire.sort()
-#
-#         # Récupère l'élément avec la plus petite priorité
-#         distance_actuelle, (x, y) = case_prioritaire.pop(0)
-#
-#         # Si nous avons atteint l'arrivée, on sort de la boucle
-#         if (x, y) == fin:
-#             break
-#
-#         # Exploration des voisins (droite, bas, gauche, haut)
-#         for dx, dy in directions:
-#             nouveau_x, nouveau_y = x + dx, y + dy
-#
-#             if est_valide(plateau, nouveau_x, nouveau_y) and (nouveau_x, nouveau_y) not in explorees:
-#                 nouvelle_distance = distance_actuelle + 1
-#
-#                 if nouvelle_distance < distances[nouveau_x][nouveau_y]:
-#                     distances[nouveau_x][nouveau_y] = nouvelle_distance
-#
-#                     # Ajoute la distance, l'heuristique et les coordonnées dans le tableau des priorités
-#                     priorite = heuristique((nouveau_x, nouveau_y), fin)
-#                     case_prioritaire.append((priorite, (nouveau_x, nouveau_y)))
-#
-#                     # Trie la liste pour maintenir l'ordre de priorité
-#                     case_prioritaire.sort()
+   plateau_test = Plateau(10, 10, 0.2, True)
+   # Lancer A* (par défaut)
+   algo = a_star(plateau_test, use_a_star=True)
+   algo.executer()
+   algo.afficher_resultat()
+   # Lancer Dijkstra (sans heuristique)
+   algo_dijkstra = a_star(plateau_test, use_a_star=False)
+   algo_dijkstra.executer()
+   algo_dijkstra.afficher_resultat()

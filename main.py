@@ -1,8 +1,6 @@
-import parcours
 import importation
 import exportation
-from parcours import Dijkstra
-#import comparaison
+from parcours import a_star
 from plateau import Plateau
 
 
@@ -16,23 +14,20 @@ class Application:
         choix = ""
         while choix != "Q":
             print("""
-                Bienvenue sur notre application d'analyse de l'algorithme Dijkstra et A* !
-                Veuillez saisir la lettre correspondante à l'action que vous voulez réaliser :
-                    G - Génération d'un plateau de jeu
-                    C - Comparaison d'algorithmes
-                    I - Importation d'un plateau de jeu existant (.txt)
-                    Q - Quitter l'application\n
+                Bienvenue sur notre application d'analyse des algorithmes A* et Dijkstra !
+                Veuillez choisir une action :
+                    G - Générer un plateau de jeu
+                    I - Importer un plateau de jeu existant (.txt)
+                    Q - Quitter l'application
             """)
-            choix = input().strip().upper()
+            choix = input("Votre choix : ").strip().upper()
 
             if choix == "G":
                 self.generer_plateau()
-            #elif choix == "C":
-                #self.comparer_algorithmes()
             elif choix == "I":
                 self.importer_plateau()
             elif choix != "Q":
-                print("❌ Choix invalide. Veuillez entrer G, C, I ou Q.")
+                print("❌ Choix invalide. Veuillez entrer G, I ou Q.")
 
     def generer_plateau(self):
         """Génère un plateau de jeu selon les paramètres de l'utilisateur."""
@@ -41,34 +36,17 @@ class Application:
         taux = self.saisir_valeur("le taux de cases interdites (0-100)", min_val=0, max_val=100) / 100
         placement_aleatoire = self.saisir_oui_non("Placer départ/arrivée aléatoirement ? (O/N)")
 
-        # Génération du plateau avec la classe Plateau
+        # Création du plateau
         self.plateau = Plateau(largeur, longueur, taux, placement_aleatoire)
-
-        # Affichage du plateau généré
         print("\nPlateau généré :")
         self.plateau.afficher_plateau()
 
-        # Exécution de l'algorithme de Dijkstra
-        dijkstra = parcours.Dijkstra(self.plateau)
-
-        # Affichage du plateau avec le chemin
-        plateau_avec_chemin = dijkstra.afficher_resultat()
-
-        # Exportation du plateau
-        nom_fichier = input("Entrez un nom de fichier pour exporter le plateau : ").strip()
-        exportateur = exportation.Exportateur(self.plateau, plateau_avec_chemin, nom_fichier)
-        exportateur.exporter_vers_txt()
-
-    # def comparer_algorithmes(self):
-        #    """Compare les performances des algorithmes Dijkstra et A*."""
-        #      print("Le lancement de la comparaison est en cours ...")
-        #     comparateur = comparaison.Comparateur([])
-    #     comparateur.comparaison("C")
-
+        # Choix de l'algorithme
+        self.lancer_algorithme()
 
     def importer_plateau(self):
         """Importe un plateau à partir d'un fichier texte."""
-        chemin_fichier = input("\t\t\t\tEntrez le chemin du fichier .txt : ").strip()
+        chemin_fichier = input("Entrez le chemin du fichier .txt : ").strip()
         while not chemin_fichier.endswith(".txt"):
             print("❌ Erreur : le fichier doit être au format .txt.")
             chemin_fichier = input("Entrez un chemin valide : ").strip()
@@ -77,11 +55,29 @@ class Application:
         self.plateau = importateur.importer_plateau()
 
         if self.plateau:
-            print("📌 Plateau importé avec succès !")
             self.plateau.afficher_plateau()
+            self.lancer_algorithme()
+
+    def lancer_algorithme(self):
+        """Demande à l'utilisateur quel algorithme utiliser et exécute le chemin optimal."""
+        choix_algo = ""
+        while choix_algo not in ["A", "D"]:
+            choix_algo = input("Choisissez un algorithme : A (A*) ou D (Dijkstra) : ").strip().upper()
+            if choix_algo not in ["A", "D"]:
+                print("❌ Réponse invalide. Entrez 'A' pour A* ou 'D' pour Dijkstra.")
+
+        use_a_star = (choix_algo == "A")
+        algo = a_star(self.plateau, use_a_star=use_a_star)
+        algo.executer()
+        plateau_avec_chemin = algo.afficher_resultat()
+
+        # Exportation du plateau
+        nom_fichier = input("Entrez un nom de fichier pour exporter le plateau : ").strip()
+        exportateur = exportation.Exportateur(self.plateau, plateau_avec_chemin, nom_fichier)
+        exportateur.exporter_vers_txt()
 
     def saisir_valeur(self, message, min_val=None, max_val=None):
-        """Demande à l'utilisateur une valeur numérique valide."""
+        """Demande une valeur numérique valide à l'utilisateur."""
         while True:
             try:
                 valeur = int(input(f"Veuillez entrer {message} : ").strip())
@@ -92,7 +88,7 @@ class Application:
                 print(f"❌ Erreur : La valeur doit être un entier entre {min_val} et {max_val}.")
 
     def saisir_oui_non(self, message):
-        """Demande une réponse Oui/Non à l'utilisateur et retourne un booléen."""
+        """Demande une réponse Oui/Non et retourne un booléen."""
         reponse = ""
         while reponse not in ["O", "N"]:
             reponse = input(f"{message} ").strip().upper()
