@@ -42,3 +42,17 @@ class Exportateur:
         """Écrit un plateau dans le fichier."""
         for ligne in plateau.cases:
             fichier.write(' '.join(case.get_type() for case in ligne) + "\n")
+
+if __name__ == "__main__":
+    # Création d'un plateau factice
+    largeur, longueur = 10, 10
+    plateau_test = Plateau(largeur, longueur, 0.2, True)
+
+    # Création d'un chemin factice
+    plateau_avec_chemin_test = [[plateau_test.cases[x][y].type_case for y in range(longueur)] for x in range(largeur)]
+    for i in range(min(largeur, longueur)):  # On trace un chemin diagonal pour le test
+        plateau_avec_chemin_test[i][i] = '.'  # 'X' pour représenter un chemin
+
+    # Création de l'exportateur et test d'exportation
+    exportateur = Exportateur(plateau_test, plateau_avec_chemin_test, "test_export")
+    exportateur.exporter_vers_txt()

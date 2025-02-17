@@ -72,7 +72,7 @@ class Importateur:
 
 
 if __name__ == "__main__":
-    chemin_fichier = "test.txt"  # Remplace avec le chemin réel du fichier
+    chemin_fichier = "test_import.txt"  # Remplace avec le chemin réel du fichier
     importateur = Importateur(chemin_fichier)
 
     plateau = importateur.importer_plateau()

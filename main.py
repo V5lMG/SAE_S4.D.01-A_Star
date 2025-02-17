@@ -1,3 +1,4 @@
+import comparaison
 import importation
 import exportation
 from parcours import A_star
@@ -18,6 +19,7 @@ class Application:
                 Veuillez choisir une action :
                     G - Générer un plateau de jeu
                     I - Importer un plateau de jeu existant (.txt)
+                    C - Lancer une comparaison entre A* et Dijkstra
                     Q - Quitter l'application
             """)
             choix = input("Votre choix : ").strip().upper()
@@ -29,7 +31,7 @@ class Application:
             elif choix == "C":
                 self.lancer_comparaison()
             elif choix != "Q":
-                print("❌ Choix invalide. Veuillez entrer G, I ou Q.")
+                print("❌ Choix invalide. Veuillez entrer G, I, C ou Q.")
 
     def generer_plateau(self):
         """Génère un plateau de jeu selon les paramètres de l'utilisateur."""
@@ -60,9 +62,12 @@ class Application:
             self.plateau.afficher_plateau()
             self.lancer_algorithme()
 
-
     def lancer_comparaison(self):
-        comparaison
+        """Lance une comparaison et demande à l'utilisateur le nom du fichier pour le rapport en PDF."""
+        print("\nComparaison en cours ...")
+        comparaison.ComparaisonAStarDijkstra(largeur=50, longueur=125, max_taux=30).executer()
+        print("Comparaison terminée. Veuillez vérifier votre fenêtre d'affichage pour consulter les graphiques.")
+        print(f"Le rapport est enregistré en dans \"comparaison.png\".")
 
     def lancer_algorithme(self):
         """Demande à l'utilisateur quel algorithme utiliser et exécute le chemin optimal."""

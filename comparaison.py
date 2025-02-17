@@ -1,83 +1,86 @@
-# Classe permettant de comparer Dijkstra et A* à l'aide d'un graphique,
-# en abscisse le taux de cause interdite, en ordonnée le nombre de case visité
-
 import matplotlib.pyplot as plt
 from parcours import A_star
 from plateau import Plateau
 import time
 
-def comparaison(choix):
-    # Données d'exemple
-    taux_cases_interdites = range(30)  # Tableau du taux de cases interdites
-    tab_cases_visitees_Dijkstra = []   # Tableau des cases visitées par Dijkstra
-    moy_cases_visitees_Dijkstra = []   # Tableau des moyennes des cases visitées par Dijkstra
-    tab_cases_visitees_a_star =       []   # Tableau des cases visitées par A_star
-    moy_cases_visitees_a_star =   []   # Tableau des moyennes des cases visitées par A_star
-    temps_dijkstra =              []   # Stocke les temps d'exécution
-    temps_a_star   =              []   # Stocke les temps d'exécution
-    moy_temps_dijkstra =          []
-    moy_temps_a_star   =          []
+class ComparaisonAStarDijkstra:
 
-    for i in range(len(taux_cases_interdites)):
+    def __init__(self, largeur, longueur, max_taux):
+        self.largeur = largeur
+        self.longueur = longueur
+        self.taux_cases_interdites = list(range(max_taux))  # Converti en liste pour éviter les erreurs d'indexation
+        self.moy_cases_visitees_dijkstra = []
+        self.moy_cases_visitees_a_star   = []
+        self.moy_temps_dijkstra          = []
+        self.moy_temps_a_star            = []
+        self.iteration                   = 5                # Nombre d'itération par défaut
 
-        # Réinitialisation des tableaux
-        cases_visitees_dijkstra = []
-        cases_visitees_a_star = []
+    def executer(self):
+        """Exécute la comparaison entre A* et Dijkstra et stocke les résultats."""
+        for taux in self.taux_cases_interdites:
+            cases_visitees_dijkstra = []
+            cases_visitees_a_star   = []
+            temps_dijkstra          = []
+            temps_a_star            = []
 
-        for j in range(50):
-            # Génère un plateau identique pour les 2 algorithmes
-            plateau = Plateau(50, 125, taux_cases_interdites[i]/100, True)
+            # Nombre d'itéarion par défaut = 50
+            for _ in range(self.iteration):
+                plateau = Plateau(self.largeur, self.longueur, taux / 100, True)
 
-            # Récupérer les chemins à l'aide de dijkstra
-            algo_dijkstra = A_star(plateau, use_a_star=False)
-            start = time.time()
-            chemin, cases_visitees_dijkstra = algo_dijkstra.executer()
-            end = time.time()
-            ecart = end - start
+                # Exécution de Dijkstra (sur la place publique o_o)
+                algo_dijkstra = A_star(plateau, use_a_star=False)
+                start = time.time()
+                _, cases_explorees_dijkstra = algo_dijkstra.executer()
+                temps_dijkstra.append(time.time() - start)
+                cases_visitees_dijkstra.append(len(cases_explorees_dijkstra))
 
-            # Récupération des informations dans des tableaux correspondants
-            tab_cases_visitees_Dijkstra.append(len(cases_visitees_dijkstra))
-            temps_dijkstra.append(ecart)
+                # Exécution de A*
+                algo_a_star = A_star(plateau, use_a_star=True)
+                start = time.time()
+                _, cases_explorees_a_star = algo_a_star.executer()
+                temps_a_star.append(time.time() - start)
+                cases_visitees_a_star.append(len(cases_explorees_a_star))
 
-            # Récupérer les chemins à l'aide de A*
-            algo_a_star = A_star(plateau, use_a_star=True)
-            start = time.time()
-            algo_a_star.executer()
-            end = time.time()
-            ecart = end - start
+            # Stockage des moyennes pour chaque algorithmes
+            self.moy_cases_visitees_dijkstra.append(sum(cases_visitees_dijkstra) / 50)
+            self.moy_cases_visitees_a_star.append(sum(cases_visitees_a_star) / 50)
+            self.moy_temps_dijkstra.append(sum(temps_dijkstra) / 50)
+            self.moy_temps_a_star.append(sum(temps_a_star) / 50)
 
-            # Récupération des informations dans des tableaux correspondans
-            tab_cases_visitees_a_star.append(len(cases_visitees_a_star))
-            temps_a_star.append(ecart)
+        # Affichage des résultats après l'exécution
+        self.afficher_graphiques()
 
-        moyenne = sum(tab_cases_visitees_Dijkstra) / len(tab_cases_visitees_Dijkstra)
-        moy_cases_visitees_Dijkstra.append(moyenne)
+    def afficher_graphiques(self):
+        """Affiche les graphiques comparant A* et Dijkstra."""
+        plt.figure(figsize=(10, 5))
 
-        moyenne = sum(temps_dijkstra) / len(temps_dijkstra)
-        moy_temps_a_star.append(moyenne)
+        # Comparaison du nombre de cases visitées
+        plt.subplot(1, 2, 1)
+        plt.plot(self.taux_cases_interdites, self.moy_cases_visitees_dijkstra, label="Dijkstra", marker="o")
+        plt.plot(self.taux_cases_interdites, self.moy_cases_visitees_a_star, label="A*", marker="s")
+        plt.xlabel('Taux de cases interdites (%)')
+        plt.ylabel('Moyenne des cases visitées')
+        plt.title('Comparaison du nombre moyen de cases visitées')
+        plt.legend()
 
-        moyenne = sum(tab_cases_visitees_a_star) / len(tab_cases_visitees_a_star)
-        moy_cases_visitees_a_star.append(moyenne)
+        # Comparaison du temps d'exécution
+        plt.subplot(1, 2, 2)
+        plt.plot(self.taux_cases_interdites, self.moy_temps_dijkstra, label="Dijkstra", marker="o")
+        plt.plot(self.taux_cases_interdites, self.moy_temps_a_star, label="A*", marker="s")
+        plt.xlabel('Taux de cases interdites (%)')
+        plt.ylabel('Temps moyen d\'exécution (s)')
+        plt.title('Comparaison du temps moyen d\'exécution')
+        plt.legend()
 
-        moyenne = sum(temps_a_star) / len(temps_a_star)
-        moy_temps_a_star.append(moyenne)
+        # Titre global
+        plt.suptitle(f"Comparaison entre l'algorithme A* et Dijkstra sur {self.iteration} itérations. ",
+                     fontsize=14, fontweight='bold')
 
-    plt.plot(taux_cases_interdites, moy_cases_visitees_Dijkstra)
-    plt.plot(taux_cases_interdites, moy_cases_visitees_a_star)
-    plt.ylabel('Nombre de case visitées pour relier D à A \n'
-               'Moyenne obtenue sur 50 plateaux')
-    plt.xlabel('Taux de cases interdites(en %)')
-    plt.title("Comparaison A* et Dijkstra en fonction du taux de cases interdites \n"
-              "Plateaux de dimensions fixes (largeur=50, longueur=125)")
+        plt.tight_layout()
+        plt.savefig("comparaison.png")
+        plt.show()
 
-    plt.plot(taux_cases_interdites, moy_temps_dijkstra)
-    plt.plot(taux_cases_interdites, moy_temps_a_star)
-    plt.ylabel('Nombre de case visitées pour relier D à A \n'
-               'Moyenne obtenue sur 50 plateaux')
-    plt.xlabel('Taux de cases interdites(en %)')
-    plt.title("Comparaison A* et Dijkstra en fonction du taux de cases interdites \n"
-              "Plateaux de dimensions fixes (largeur=50, longueur=125)")
-    plt.show()
-
-
-comparaison("C")
+# Exécution de la comparaison
+if __name__ == "__main__":
+    comparaison = ComparaisonAStarDijkstra(largeur=50, longueur=125, max_taux=30)
+    comparaison.executer()
