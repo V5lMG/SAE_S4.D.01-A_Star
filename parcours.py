@@ -1,10 +1,7 @@
-from heapq import heappop, heappush
 import math
-
 from plateau import Plateau
 
-
-class a_star:
+class A_star:
     """Implémente A* par défaut et bascule sur Dijkstra si nécessaire."""
 
     def __init__(self, plateau, use_a_star=True):
@@ -44,10 +41,8 @@ class a_star:
         if self.use_a_star:
             # Calcul de l'heuristique
             dist = math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
-            print(f"Calcul heuristique entre {a} et {b} : {dist}")
             return dist
         else:
-            print(f"Heuristique non utilisée, retourne 0")
             return 0
 
     def executer(self):
@@ -57,14 +52,14 @@ class a_star:
             return [], set()
 
         # Initialisation des distances et de la file de priorité
-        self.distances = {(i, j): float('inf') for i in range(self.plateau.largeur) for j in
-                          range(self.plateau.longueur)}
+        self.distances = {(i, j): float('inf') for i in range(self.plateau.largeur) for j in range(self.plateau.longueur)}
         self.distances[self.debut] = 0
         file_priorite = [(0, self.debut)]
         self.precedents[self.debut] = None
 
         while file_priorite:
-            _, (x, y) = heappop(file_priorite)
+            file_priorite.sort() # Tri basé sur la priorité (premier élément du tuple)
+            _, (x, y) = file_priorite.pop(0)
 
             # Si arrivée atteinte, on stoppe
             if (x, y) == self.fin:
@@ -98,7 +93,8 @@ class a_star:
                             print(f"Erreur lors du calcul de l'heuristique : {e}")
                             continue
 
-                        heappush(file_priorite, (priorite, (nx, ny)))
+                        file_priorite.append((priorite, (nx, ny)))
+                        file_priorite.sort()
                         self.explorees.add((nx, ny))
 
         # Reconstruire le chemin
@@ -113,7 +109,7 @@ class a_star:
             chemin.append(actuel)
             actuel = self.precedents.get(actuel)
         return chemin[::-1]  # Inversé pour partir du départ
-
+    
     def afficher_resultat(self):
         """Affiche le plateau avec le chemin et les explorations."""
         grille_affichage = [[case.type_case for case in ligne] for ligne in self.plateau.cases]
@@ -140,10 +136,10 @@ class a_star:
 if __name__ == "__main__":
    plateau_test = Plateau(10, 10, 0.2, True)
    # Lancer A* (par défaut)
-   algo = a_star(plateau_test, use_a_star=True)
+   algo = A_star(plateau_test, use_a_star=True)
    algo.executer()
    algo.afficher_resultat()
    # Lancer Dijkstra (sans heuristique)
-   algo_dijkstra = a_star(plateau_test, use_a_star=False)
+   algo_dijkstra = A_star(plateau_test, use_a_star=False)
    algo_dijkstra.executer()
    algo_dijkstra.afficher_resultat()

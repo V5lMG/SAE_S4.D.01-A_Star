@@ -1,4 +1,3 @@
-import case
 from plateau import Plateau
 
 class Exportateur:

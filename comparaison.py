@@ -2,20 +2,21 @@
 # en abscisse le taux de cause interdite, en ordonnée le nombre de case visité
 
 import matplotlib.pyplot as plt
-import parcours
+from parcours import A_star
+from plateau import Plateau
 import time
 
 def comparaison(choix):
     # Données d'exemple
     taux_cases_interdites = range(30)  # Tableau du taux de cases interdites
-    cases_visitees_Dijkstra =     []   # Tableau des cases visitées par Dijkstra
+    tab_cases_visitees_Dijkstra = []   # Tableau des cases visitées par Dijkstra
     moy_cases_visitees_Dijkstra = []   # Tableau des moyennes des cases visitées par Dijkstra
-    cases_visitees_a_star =       []   # Tableau des cases visitées par A_star
+    tab_cases_visitees_a_star =       []   # Tableau des cases visitées par A_star
     moy_cases_visitees_a_star =   []   # Tableau des moyennes des cases visitées par A_star
-    temps_dijkstra = [] # Stocke les temps d'exécution
-    temps_a_star   = [] # Stocke les temps d'exécution
-    moy_temps_dijkstra = []
-    moy_temps_a_star   = []
+    temps_dijkstra =              []   # Stocke les temps d'exécution
+    temps_a_star   =              []   # Stocke les temps d'exécution
+    moy_temps_dijkstra =          []
+    moy_temps_a_star   =          []
 
     for i in range(len(taux_cases_interdites)):
 
@@ -25,39 +26,37 @@ def comparaison(choix):
 
         for j in range(50):
             # Génère un plateau identique pour les 2 algorithmes
-            plateau = generation_plateau(50, 125, taux_cases_interdites[i]/100, True)
+            plateau = Plateau(50, 125, taux_cases_interdites[i]/100, True)
 
             # Récupérer les chemins à l'aide de dijkstra
+            algo_dijkstra = A_star(plateau, use_a_star=False)
             start = time.time()
-            chemin, explorees = dijkstra(plateau)
+            chemin, cases_visitees_dijkstra = algo_dijkstra.executer()
             end = time.time()
             ecart = end - start
 
-            # Affichage de tous les plateaux
-            plateau_avec_chemin, nbr_cases_visitees = affichage_chemin(plateau, chemin, explorees, choix)
-
-            cases_visitees_Dijkstra.append(nbr_cases_visitees)
+            # Récupération des informations dans des tableaux correspondants
+            tab_cases_visitees_Dijkstra.append(len(cases_visitees_dijkstra))
             temps_dijkstra.append(ecart)
 
-            # Récupérer les chemins à l'aide de a_star
+            # Récupérer les chemins à l'aide de A*
+            algo_a_star = A_star(plateau, use_a_star=True)
             start = time.time()
-            chemin, explorees = parcours.a_star(plateau)
+            algo_a_star.executer()
             end = time.time()
             ecart = end - start
 
-            # Affichage de tous les plateaux
-            plateau_avec_chemin, nbr_cases_visitees = parcours.affichage_chemin(plateau, chemin, explorees, choix)
-
-            cases_visitees_a_star.append(nbr_cases_visitees)
+            # Récupération des informations dans des tableaux correspondans
+            tab_cases_visitees_a_star.append(len(cases_visitees_a_star))
             temps_a_star.append(ecart)
 
-        moyenne = sum(cases_visitees_Dijkstra) / len(cases_visitees_Dijkstra)
+        moyenne = sum(tab_cases_visitees_Dijkstra) / len(tab_cases_visitees_Dijkstra)
         moy_cases_visitees_Dijkstra.append(moyenne)
 
         moyenne = sum(temps_dijkstra) / len(temps_dijkstra)
         moy_temps_a_star.append(moyenne)
 
-        moyenne = sum(cases_visitees_a_star) / len(cases_visitees_a_star)
+        moyenne = sum(tab_cases_visitees_a_star) / len(tab_cases_visitees_a_star)
         moy_cases_visitees_a_star.append(moyenne)
 
         moyenne = sum(temps_a_star) / len(temps_a_star)

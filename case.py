@@ -3,9 +3,7 @@ class Case:
     def __init__(self, x, y, type_case):
         self.x = x
         self.y = y
-        self.type_case = type_case  # 'O' (vide), 'X' (mur), 'D' (départ), 'A' (arrivée)
-        self.visited = False  # Pour marquer les cases explorées
-        self.parent = None  # Utilisé pour reconstruire le chemin
+        self.type_case = type_case
 
     def est_traversable(self):
         """Retourne True si la case peut être traversée (pas un mur)."""

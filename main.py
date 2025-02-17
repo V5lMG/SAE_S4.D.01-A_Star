@@ -1,6 +1,6 @@
 import importation
 import exportation
-from parcours import a_star
+from parcours import A_star
 from plateau import Plateau
 
 
@@ -26,6 +26,8 @@ class Application:
                 self.generer_plateau()
             elif choix == "I":
                 self.importer_plateau()
+            elif choix == "C":
+                self.lancer_comparaison()
             elif choix != "Q":
                 print("❌ Choix invalide. Veuillez entrer G, I ou Q.")
 
@@ -58,6 +60,10 @@ class Application:
             self.plateau.afficher_plateau()
             self.lancer_algorithme()
 
+
+    def lancer_comparaison(self):
+        comparaison
+
     def lancer_algorithme(self):
         """Demande à l'utilisateur quel algorithme utiliser et exécute le chemin optimal."""
         choix_algo = ""
@@ -67,7 +73,7 @@ class Application:
                 print("❌ Réponse invalide. Entrez 'A' pour A* ou 'D' pour Dijkstra.")
 
         use_a_star = (choix_algo == "A")
-        algo = a_star(self.plateau, use_a_star=use_a_star)
+        algo = A_star(self.plateau, use_a_star=use_a_star)
         algo.executer()
         plateau_avec_chemin = algo.afficher_resultat()
 

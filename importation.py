@@ -1,7 +1,6 @@
 from case import Case
 from plateau import Plateau
 
-
 class Importateur:
     def __init__(self, fichier):
         self.fichier = fichier
