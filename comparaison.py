@@ -13,7 +13,7 @@ class ComparaisonAStarDijkstra:
         self.moy_cases_visitees_a_star   = []
         self.moy_temps_dijkstra          = []
         self.moy_temps_a_star            = []
-        self.iteration                   = 5                # Nombre d'itération par défaut
+        self.iteration                   = 50                # Nombre d'itération par défaut
 
     def executer(self):
         """Exécute la comparaison entre A* et Dijkstra et stocke les résultats."""
