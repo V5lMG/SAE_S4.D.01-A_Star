@@ -70,15 +70,15 @@ class Application:
         print(f"Le rapport est enregistré en dans \"comparaison.png\".")
 
     def lancer_algorithme(self):
-        """Demande à l'utilisateur quel algorithme utiliser et exécute le chemin optimal."""
+        """Demande à l'utilisateur quelle heuristique utiliser et exécute le chemin optimal."""
         choix_algo = ""
-        while choix_algo not in ["A", "D"]:
-            choix_algo = input("Choisissez un algorithme : A (A*) ou D (Dijkstra) : ").strip().upper()
-            if choix_algo not in ["A", "D"]:
-                print("❌ Réponse invalide. Entrez 'A' pour A* ou 'D' pour Dijkstra.")
+        while choix_algo not in ["V", "O", "N"]:
+            choix_algo = input("Choisissez une heuristique : V (ville), O (oiseau) ou N (null) : ").strip().upper()
+            if choix_algo not in ["V", "O", "N"]:
+                print("❌ Réponse invalide. Entrez V pour choisir une heuristique ville, "
+                      "O pour une heuristique oiseau ou N pour une null (Dijkstra)")
 
-        use_a_star = (choix_algo == "A")
-        algo = A_star(self.plateau, use_a_star=use_a_star)
+        algo = A_star(self.plateau, heuristique=choix_algo)
         algo.executer()
         plateau_avec_chemin = algo.afficher_resultat()
 
@@ -106,6 +106,7 @@ class Application:
             if reponse not in ["O", "N"]:
                 print("❌ Réponse invalide. Entrez 'O' pour Oui ou 'N' pour Non.")
         return reponse == "O"
+
 
 
 # Lancement de l'application

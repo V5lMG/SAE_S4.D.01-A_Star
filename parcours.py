@@ -1,21 +1,24 @@
 import math
 from plateau import Plateau
 
+
 class A_star:
     """Implémente A* par défaut et bascule sur Dijkstra si nécessaire."""
 
-    def __init__(self, plateau, use_a_star=True):
+    def __init__(self, plateau, heuristique="V"):
         """
         Initialise l'algorithme.
         :param plateau: Instance de Plateau.
-        :param use_a_star: Utiliser A* (True) ou Dijkstra (False).
+        :param heuristique: Type d'heuristique ('V' pour Ville, 'O' pour Oiseau, 'N' pour Dijkstra).
         """
         self.plateau = plateau
-        self.use_a_star = use_a_star
+        self.type_heuristique = heuristique
         self.debut, self.fin = self.trouver_debut_fin()
         self.distances = {}
         self.precedents = {}
         self.explorees = set()
+        self.nombre_cases_explorees = 0
+        self.taille_chemin_final = 0
         self.chemin = []
 
     def trouver_debut_fin(self):
@@ -36,30 +39,36 @@ class A_star:
                 and 0 <= y < self.plateau.longueur
                 and self.plateau.cases[x][y].est_traversable())
 
-    def heuristique(self, a, b):
-        """Retourne la distance heuristique entre deux points."""
-        if self.use_a_star:
-            # Calcul de l'heuristique
-            dist = math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
-            return dist
-        else:
+    def calcul_heuristique(self, a, b):
+        """Retourne la distance heuristique entre deux points selon l'heuristique choisie."""
+        if self.type_heuristique == "V":  # Distance de Manhattan
+            return abs(b[0] - a[0]) + abs(b[1] - a[1])
+        elif self.type_heuristique == "O":  # Distance Euclidienne
+            return math.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2)
+        elif self.type_heuristique == "N":  # Dijkstra (pas d'heuristique)
             return 0
+        else:
+            raise ValueError(f"Heuristique inconnue : {self.type_heuristique}")
 
     def executer(self):
-        """Exécute A* ou Dijkstra selon la configuration."""
+        """Exécute l'algorithme avec la bonne heuristique."""
         if not self.debut or not self.fin:
             print("Erreur : Départ ou arrivée introuvables.")
             return [], set()
 
         # Initialisation des distances et de la file de priorité
-        self.distances = {(i, j): float('inf') for i in range(self.plateau.largeur) for j in range(self.plateau.longueur)}
+        self.distances = {(i, j): float('inf') for i in
+                          range(self.plateau.largeur) for j in
+                          range(self.plateau.longueur)}
         self.distances[self.debut] = 0
-        file_priorite = [(0, self.debut)]
+        file_priorite = [(0, self.debut)]  # (priorité, (x, y))
+
         self.precedents[self.debut] = None
 
         while file_priorite:
-            file_priorite.sort() # Tri basé sur la priorité (premier élément du tuple)
-            _, (x, y) = file_priorite.pop(0)
+            file_priorite.sort()  # Tri manuel pour simuler le comportement d'un tas
+            _, (x, y) = file_priorite.pop(
+                0)  # Extraire la case avec la plus basse priorité
 
             # Si arrivée atteinte, on stoppe
             if (x, y) == self.fin:
@@ -76,26 +85,21 @@ class A_star:
                         self.distances[(nx, ny)] = nouvelle_distance
                         self.precedents[(nx, ny)] = (x, y)
 
-                        # Vérification que les coordonnées sont valides avant d'appliquer l'heuristique
-                        if not (0 <= nx < self.plateau.largeur and 0 <= ny < self.plateau.longueur):
-                            print(f"Coordonnées invalides : ({nx}, {ny})")
-                            continue  # Ignore ces coordonnées invalides
-
-                        # Vérifier que `self.fin` contient des valeurs correctes
-                        if not (0 <= self.fin[0] < self.plateau.largeur and 0 <= self.fin[1] < self.plateau.longueur):
-                            print(f"Erreur : Arrivée (fin) hors limites : {self.fin}")
+                        # Vérification de la validité de `self.fin`
+                        if not (0 <= self.fin[0] < self.plateau.largeur and 0 <=
+                                self.fin[1] < self.plateau.longueur):
+                            print(f"Erreur : Arrivée hors limites : {self.fin}")
                             return [], set()
 
-                        # Calcul de la priorité avec une heuristique (si A* est utilisé)
-                        try:
-                            priorite = nouvelle_distance + self.heuristique((nx, ny), self.fin)
-                        except ValueError as e:
-                            print(f"Erreur lors du calcul de l'heuristique : {e}")
-                            continue
+                        # Calcul de la priorité avec l'heuristique choisie
+                        priorite = nouvelle_distance + self.calcul_heuristique(
+                            (nx, ny), self.fin)
 
-                        file_priorite.append((priorite, (nx, ny)))
-                        file_priorite.sort()
+                        file_priorite.append(
+                            (priorite, (nx, ny)))  # Ajouter à la liste
+                        file_priorite.sort()  # Réordonner la liste
                         self.explorees.add((nx, ny))
+                        self.nombre_cases_explorees += 1
 
         # Reconstruire le chemin
         self.chemin = self.reconstruire_chemin()
@@ -109,37 +113,61 @@ class A_star:
             chemin.append(actuel)
             actuel = self.precedents.get(actuel)
         return chemin[::-1]  # Inversé pour partir du départ
-    
+
+    def afficher_bilan(self):
+        print("")
+        print(f"Nombre de cases visistées {self.nombre_cases_explorees}")
+        print(f"Taille du chemin final : {self.taille_chemin_final}")
+        print("")
+
     def afficher_resultat(self):
         """Affiche le plateau avec le chemin et les explorations."""
-        grille_affichage = [[case.type_case for case in ligne] for ligne in self.plateau.cases]
+        grille_affichage = [[case.type_case for case in ligne] for ligne in
+                            self.plateau.cases]
 
         # Marquer les cases explorées
         for x, y in self.explorees:
             if grille_affichage[x][y] == "O":
                 grille_affichage[x][y] = "*"
 
+
         # Marquer le chemin final
         for x, y in self.chemin:
             if grille_affichage[x][y] not in ["D", "A"]:
                 grille_affichage[x][y] = "."
+                self.taille_chemin_final += 1
+
+        # String de l'heuristique choisi
+        if self.type_heuristique == "V":
+            heuristique_p = "Ville (Manhattan)"
+        elif self.type_heuristique == "O":
+            heuristique_p = "Oiseau (Euclidienne)"
+        else:
+            heuristique_p = "Dijkstra (Sans heuristique)"
 
         # Affichage du plateau
-        print("\nPlateau avec chemin trouvé :")
+        print(f"\nPlateau avec chemin trouvé par l'heuristique {heuristique_p} :")
         for ligne in grille_affichage:
             print(" ".join(ligne))
-        print()
 
+        self.afficher_bilan()
         return grille_affichage
 
 # Test
 if __name__ == "__main__":
-   plateau_test = Plateau(10, 10, 0.2, True)
-   # Lancer A* (par défaut)
-   algo = A_star(plateau_test, use_a_star=True)
-   algo.executer()
-   algo.afficher_resultat()
-   # Lancer Dijkstra (sans heuristique)
-   algo_dijkstra = A_star(plateau_test, use_a_star=False)
-   algo_dijkstra.executer()
-   algo_dijkstra.afficher_resultat()
+    plateau_test = Plateau(10, 15, 0, False)
+
+    # Lancer A* avec heuristique Ville
+    algo = A_star(plateau_test, heuristique="V")
+    algo.executer()
+    algo.afficher_resultat()
+
+    # Lancer A* avec heuristique Oiseau
+    algo_oiseau = A_star(plateau_test, heuristique="O")
+    algo_oiseau.executer()
+    algo_oiseau.afficher_resultat()
+
+    # Lancer Dijkstra (heuristique null)
+    algo_dijkstra = A_star(plateau_test, heuristique="N")
+    algo_dijkstra.executer()
+    algo_dijkstra.afficher_resultat()
