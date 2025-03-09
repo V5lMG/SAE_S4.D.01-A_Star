@@ -155,7 +155,7 @@ class A_star:
 
 # Test
 if __name__ == "__main__":
-    plateau_test = Plateau(10, 15, 0, False)
+    plateau_test = Plateau(10, 10, 0, False)
 
     # Lancer A* avec heuristique Ville
     algo = A_star(plateau_test, heuristique="V")
