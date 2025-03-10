@@ -5,7 +5,7 @@ from plateau import Plateau
 class A_star:
     """Implémente A* par défaut et bascule sur Dijkstra si nécessaire."""
 
-    def __init__(self, plateau, heuristique="V"):
+    def __init__(self, plateau, heuristique):
         """
         Initialise l'algorithme.
         :param plateau: Instance de Plateau.
@@ -13,10 +13,13 @@ class A_star:
         """
         self.plateau = plateau
         self.type_heuristique = heuristique
+
         self.debut, self.fin = self.trouver_debut_fin()
-        self.distances = {}
-        self.precedents = {}
-        self.explorees = set()
+        self.distances = {self.debut: 0}                    # Dictionnaire des distances depuis le départ
+        self.precedents = {}                                # Dictionnaire pour reconstruire le chemin
+        self.cases_explorees = set()                        # Ensemble des cases déjà explorées
+        self.en_attente = {self.debut}                      # Ensemble des cases en attente d'exploration
+
         self.nombre_cases_explorees = 0
         self.taille_chemin_final = 0
         self.chemin = []
@@ -39,71 +42,69 @@ class A_star:
                 and 0 <= y < self.plateau.longueur
                 and self.plateau.cases[x][y].est_traversable())
 
-    def calcul_heuristique(self, a, b):
+    def calcul_heuristique(self, case_actuelle, arrive):
         """Retourne la distance heuristique entre deux points selon l'heuristique choisie."""
-        if self.type_heuristique == "V":  # Distance de Manhattan
-            return abs(b[0] - a[0]) + abs(b[1] - a[1])
-        elif self.type_heuristique == "O":  # Distance Euclidienne
-            return math.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2)
-        elif self.type_heuristique == "N":  # Dijkstra (pas d'heuristique)
+        # Calcul de h
+        if   self.type_heuristique == "V":     # Distance de Manhattan
+            return abs(case_actuelle[0] - arrive[0]) + abs(case_actuelle[1] - arrive[1])
+        elif self.type_heuristique == "O":     # Distance Euclidienne
+            return math.sqrt((case_actuelle[0] - arrive[0]) ** 2 + (case_actuelle[1] - arrive[1]) ** 2)
+        elif self.type_heuristique == "N":     # Dijkstra (pas d'heuristique)
             return 0
         else:
             raise ValueError(f"Heuristique inconnue : {self.type_heuristique}")
 
+    def cout_total(self, case):
+        return self.distances[case] + self.calcul_heuristique(case, self.fin)
+
     def executer(self):
-        """Exécute l'algorithme avec la bonne heuristique."""
+        """Exécute l'algorithme A*."""
         if not self.debut or not self.fin:
             print("Erreur : Départ ou arrivée introuvables.")
-            return [], set()
+            return
 
-        # Initialisation des distances et de la file de priorité
-        self.distances = {(i, j): float('inf') for i in
-                          range(self.plateau.largeur) for j in
-                          range(self.plateau.longueur)}
-        self.distances[self.debut] = 0
-        file_priorite = [(0, self.debut)]  # (priorité, (x, y))
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # Droite, Bas, Gauche, Haut
 
-        self.precedents[self.debut] = None
+        while self.en_attente:
+            if not self.en_attente:
+                print("Erreur : Aucune solution trouvée, l'algorithme est bloqué.")
+                return self.nombre_cases_explorees
 
-        while file_priorite:
-            file_priorite.sort()  # Tri manuel pour simuler le comportement d'un tas
-            _, (x, y) = file_priorite.pop(
-                0)  # Extraire la case avec la plus basse priorité
+            # Sélectionner la case avec le plus petit coût total (f = g + h)
+            case_actuelle = min(self.en_attente, key=self.cout_total)
 
-            # Si arrivée atteinte, on stoppe
-            if (x, y) == self.fin:
-                break
+            # Si on atteint la case d'arrivée, on arrête l'algorithme
+            if case_actuelle == self.fin:
+                self.chemin = self.reconstruire_chemin()
+                return self.nombre_cases_explorees
 
-            # Exploration des voisins (droite, bas, gauche, haut)
-            for dx, dy in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
-                nx, ny = x + dx, y + dy
+            # Marquer la case actuelle comme explorée
+            self.en_attente.remove(case_actuelle)
+            self.cases_explorees.add(case_actuelle)
+            self.nombre_cases_explorees += 1
 
-                if self.est_valide(nx, ny):
-                    nouvelle_distance = self.distances[(x, y)] + 1
+            # Explorer les voisins valides
+            voisins = []
+            for dx, dy in directions:
+                voisin_x, voisin_y = case_actuelle[0] + dx, case_actuelle[
+                    1] + dy
+                voisin = (voisin_x, voisin_y)
 
-                    if nouvelle_distance < self.distances[(nx, ny)]:
-                        self.distances[(nx, ny)] = nouvelle_distance
-                        self.precedents[(nx, ny)] = (x, y)
+                if self.est_valide(voisin_x,
+                                   voisin_y) and voisin not in self.cases_explorees:
+                    nouveau_cout = self.distances[
+                                       case_actuelle] + 1  # Coût de déplacement
 
-                        # Vérification de la validité de `self.fin`
-                        if not (0 <= self.fin[0] < self.plateau.largeur and 0 <=
-                                self.fin[1] < self.plateau.longueur):
-                            print(f"Erreur : Arrivée hors limites : {self.fin}")
-                            return [], set()
+                    # Mise à jour si on trouve un meilleur chemin
+                    if voisin not in self.distances or nouveau_cout < self.distances[voisin]:
+                        self.distances[voisin] = nouveau_cout
+                        self.precedents[voisin] = case_actuelle
+                        voisins.append((self.cout_total(voisin), voisin))
 
-                        # Calcul de la priorité avec l'heuristique choisie
-                        priorite = nouvelle_distance + self.calcul_heuristique(
-                            (nx, ny), self.fin)
-
-                        file_priorite.append(
-                            (priorite, (nx, ny)))  # Ajouter à la liste
-                        file_priorite.sort()  # Réordonner la liste
-                        self.explorees.add((nx, ny))
-                        self.nombre_cases_explorees += 1
-
-        # Reconstruire le chemin
-        self.chemin = self.reconstruire_chemin()
-        return self.chemin, self.explorees
+            # Trier les voisins en fonction de f = g + h et les ajouter à la file d'attente
+            voisins.sort()
+            for _, voisin in voisins:
+                self.en_attente.add(voisin)
 
     def reconstruire_chemin(self):
         """Reconstruit le chemin optimal."""
@@ -116,20 +117,18 @@ class A_star:
 
     def afficher_bilan(self):
         print("")
-        print(f"Nombre de cases visistées {self.nombre_cases_explorees}")
-        print(f"Taille du chemin final : {self.taille_chemin_final}")
+        print(f"Nombre de cases visitées : {self.nombre_cases_explorees + 1}") # +1 pour ajouter le départ
+        print(f"Taille du chemin final   : {self.taille_chemin_final    + 2}") # +2 pour ajouter le départ et l'arrivée
         print("")
 
     def afficher_resultat(self):
         """Affiche le plateau avec le chemin et les explorations."""
-        grille_affichage = [[case.type_case for case in ligne] for ligne in
-                            self.plateau.cases]
+        grille_affichage = [[case.type_case for case in ligne] for ligne in self.plateau.cases]
 
         # Marquer les cases explorées
-        for x, y in self.explorees:
+        for x, y in self.cases_explorees:
             if grille_affichage[x][y] == "O":
                 grille_affichage[x][y] = "*"
-
 
         # Marquer le chemin final
         for x, y in self.chemin:
@@ -143,7 +142,7 @@ class A_star:
         elif self.type_heuristique == "O":
             heuristique_p = "Oiseau (Euclidienne)"
         else:
-            heuristique_p = "Dijkstra (Sans heuristique)"
+            heuristique_p = "Sans heuristique (Dijkstra)"
 
         # Affichage du plateau
         print(f"\nPlateau avec chemin trouvé par l'heuristique {heuristique_p} :")
@@ -153,9 +152,10 @@ class A_star:
         self.afficher_bilan()
         return grille_affichage
 
+
 # Test
 if __name__ == "__main__":
-    plateau_test = Plateau(10, 10, 0, False)
+    plateau_test = Plateau(5, 5, 0, False)
 
     # Lancer A* avec heuristique Ville
     algo = A_star(plateau_test, heuristique="V")
