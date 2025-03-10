@@ -70,8 +70,9 @@ class A_star:
                 print("Erreur : Aucune solution trouvée, l'algorithme est bloqué.")
                 return self.nombre_cases_explorees
 
-            # Sélectionner la case avec le plus petit coût total (f = g + h)
-            case_actuelle = min(self.en_attente, key=self.cout_total)
+            # Trier d'abord par coût total f = g + h, puis par h seul en cas d'égalité
+            case_actuelle = min(self.en_attente, key=lambda case: (
+                self.cout_total(case), self.calcul_heuristique(case, self.fin)))
 
             # Si on atteint la case d'arrivée, on arrête l'algorithme
             if case_actuelle == self.fin:
@@ -90,10 +91,8 @@ class A_star:
                     1] + dy
                 voisin = (voisin_x, voisin_y)
 
-                if self.est_valide(voisin_x,
-                                   voisin_y) and voisin not in self.cases_explorees:
-                    nouveau_cout = self.distances[
-                                       case_actuelle] + 1  # Coût de déplacement
+                if self.est_valide(voisin_x, voisin_y) and voisin not in self.cases_explorees:
+                    nouveau_cout = self.distances[case_actuelle] + 1  # Coût de déplacement
 
                     # Mise à jour si on trouve un meilleur chemin
                     if voisin not in self.distances or nouveau_cout < self.distances[voisin]:
