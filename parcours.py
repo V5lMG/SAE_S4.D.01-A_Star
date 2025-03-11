@@ -163,7 +163,7 @@ class A_star:
         elif self.type_heuristique == "O":
             heuristique_p = "Oiseau (Euclidienne)"
         else:
-            heuristique_p = "Sans heuristique (Dijkstra)"
+            heuristique_p = "nulle (Dijkstra)"
 
         # Affichage du plateau
         print(f"\nPlateau avec chemin trouvé par l'heuristique {heuristique_p} :")

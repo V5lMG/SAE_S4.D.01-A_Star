@@ -20,7 +20,7 @@ class Application:
                 Veuillez choisir une action :
                     G - Générer un plateau de jeu
                     I - Importer un plateau de jeu existant (.txt)
-                    C - Lancer une comparaison entre A* et Dijkstra
+                    C - Lancer une comparaison entre les différentes heuristiques 
                     Q - Quitter l'application
             """)
             choix = input("Votre choix : ").strip().upper()
