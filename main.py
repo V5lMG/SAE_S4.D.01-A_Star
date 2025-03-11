@@ -1,6 +1,7 @@
 import comparaison
 import importation
 import exportation
+import parcours
 from parcours import A_star
 from plateau import Plateau
 
@@ -86,11 +87,12 @@ class Application:
         algo = A_star(self.plateau, heuristique=choix_algo)
         algo.executer()
         plateau_avec_chemin = algo.afficher_resultat()
+        bilan = parcours.A_star.afficher_bilan(algo)
 
         # Exportation du plateau
         nom_fichier = input("Entrez un nom de fichier pour exporter le plateau : ").strip()
         exportateur = exportation.Exportateur(self.plateau, plateau_avec_chemin, nom_fichier)
-        exportateur.exporter_vers_txt()
+        exportateur.exporter_vers_txt(bilan)
 
     def saisir_valeur(self, message, min_val=None, max_val=None):
         """Demande une valeur numérique valide à l'utilisateur."""
@@ -111,7 +113,6 @@ class Application:
             if reponse not in ["O", "N"]:
                 print("❌ Réponse invalide. Entrez 'O' pour Oui ou 'N' pour Non.")
         return reponse == "O"
-
 
 
 # Lancement de l'application

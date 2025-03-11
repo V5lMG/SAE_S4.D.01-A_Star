@@ -22,7 +22,7 @@ class Exportateur:
                 nouveau_plateau.cases[x][y].type_case = grille_affichee[x][y]  # Mettre à jour les types de cases
         return nouveau_plateau
 
-    def exporter_vers_txt(self):
+    def exporter_vers_txt(self, bilan):
         """Enregistre les plateaux dans un fichier texte."""
         try:
             with open(self.nom_fichier, 'w', encoding='utf-8') as fichier:
@@ -32,6 +32,9 @@ class Exportateur:
                 fichier.write("\nPlateau avec chemin :\n")
                 self.ecrire_plateau(fichier, self.plateau_avec_chemin)
                 fichier.flush()
+
+                # Récupérer et écrire le bilan de l'algorithme A*
+                fichier.write(bilan)
 
             print(f"\nLe plateau a été exporté avec succès dans '{self.nom_fichier}'.")
 

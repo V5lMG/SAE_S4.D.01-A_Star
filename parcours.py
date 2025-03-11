@@ -130,9 +130,17 @@ class A_star:
         return chemin[::-1]  # Inversé pour partir du départ
 
     def afficher_bilan(self):
-        print(f"\nNombre de cases visitées (départ en arrivé compris) : {self.nombre_cases_explorees + 1}") # +1 pour ajouter le départ
-        print(f"Taille du chemin final                              "
-              f": {self.taille_chemin_final    + 2}\n") # +2 pour ajouter le départ et l'arrivée
+        """Afficher un petit bilan de l'algorithme."""
+        nb_cases_visitees = self.nombre_cases_explorees + 1   # +1 pour inclure le départ
+        taille_chemin     = self.taille_chemin_final    + 2   # +2 pour inclure le départ et l'arrivée
+
+        message_bilan = (
+            f"\nNombre de cases visitées (départ et arrivée compris) : {nb_cases_visitees}\n"
+            f"Taille du chemin final                               : {taille_chemin}\n"
+        )
+
+        print(message_bilan)
+        return message_bilan
 
     def afficher_resultat(self):
         """Affiche le plateau avec le chemin et les explorations."""
@@ -162,7 +170,6 @@ class A_star:
         for ligne in grille_affichage:
             print(" ".join(ligne))
 
-        self.afficher_bilan()
         return grille_affichage
 
 
