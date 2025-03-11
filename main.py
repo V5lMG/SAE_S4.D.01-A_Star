@@ -29,7 +29,12 @@ class Application:
             elif choix == "I":
                 self.importer_plateau()
             elif choix == "C":
-                self.lancer_comparaison()
+                confirmation = input(
+                    "La comparaison peut prendre jusqu'à 5 minutes. Voulez-vous continuer ? (O/N) : ").strip().upper()
+                if confirmation == "O":
+                    self.lancer_comparaison()
+                else:
+                    print("Comparaison annulée.")
             elif choix != "Q":
                 print("❌ Choix invalide. Veuillez entrer G, I, C ou Q.")
 
@@ -64,7 +69,7 @@ class Application:
 
     def lancer_comparaison(self):
         """Lance une comparaison et demande à l'utilisateur le nom du fichier pour le rapport en PDF."""
-        print("\nComparaison en cours ...")
+        print("\nComparaison en cours ... (≈ 5min)")
         comparaison.ComparaisonAStarDijkstra(largeur=50, longueur=125, max_taux=30).executer()
         print("Comparaison terminée. Veuillez vérifier votre fenêtre d'affichage pour consulter les graphiques.")
         print(f"Le rapport est enregistré en dans \"comparaison.png\".")

@@ -38,7 +38,7 @@ class A_star:
 
     def est_valide(self, x, y):
         """Vérifie si une case est dans les limites et traversable."""
-        return (0 <= x < self.plateau.largeur
+        return (    0 <= x < self.plateau.largeur
                 and 0 <= y < self.plateau.longueur
                 and self.plateau.cases[x][y].est_traversable())
 
@@ -51,28 +51,36 @@ class A_star:
             return math.sqrt((case_actuelle[0] - arrive[0]) ** 2 + (case_actuelle[1] - arrive[1]) ** 2)
         elif self.type_heuristique == "N":     # Dijkstra (pas d'heuristique)
             return 0
+
         else:
             raise ValueError(f"Heuristique inconnue : {self.type_heuristique}")
 
     def cout_total(self, case):
         return self.distances[case] + self.calcul_heuristique(case, self.fin)
 
+    def cout_total_puis_heuristique(self, case):
+        return self.cout_total(case), self.calcul_heuristique(case, self.fin)
+
     def executer(self):
         """Exécute l'algorithme A*."""
+
+        # Gérer les erreurs
         if not self.debut or not self.fin:
             print("Erreur : Départ ou arrivée introuvables.")
             return
 
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # Droite, Bas, Gauche, Haut
+        # Droite, Bas, Gauche, Haut
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
+        # Boucle principale
         while self.en_attente:
+            # Cas ou le départ / l'arrivé est bloqué dans les obstacles
             if not self.en_attente:
                 print("Erreur : Aucune solution trouvée, l'algorithme est bloqué.")
                 return self.nombre_cases_explorees
 
-            # Trier d'abord par coût total f = g + h, puis par h seul en cas d'égalité
-            case_actuelle = min(self.en_attente, key=lambda case: (
-                self.cout_total(case), self.calcul_heuristique(case, self.fin)))
+            # Trier d'abord par le coût total f = g + h, puis par h seul en cas d'égalité
+            case_actuelle = min(self.en_attente, key=self.cout_total_puis_heuristique)
 
             # Si on atteint la case d'arrivée, on arrête l'algorithme
             if case_actuelle == self.fin:
@@ -87,23 +95,30 @@ class A_star:
             # Explorer les voisins valides
             voisins = []
             for dx, dy in directions:
-                voisin_x, voisin_y = case_actuelle[0] + dx, case_actuelle[
-                    1] + dy
+                # Calcul des coordonnées du voisin en fonction de la direction actuelle
+                voisin_x, voisin_y = case_actuelle[0] + dx, case_actuelle[1] + dy
                 voisin = (voisin_x, voisin_y)
 
+                # Vérifier si le voisin est dans les limites et traversable
                 if self.est_valide(voisin_x, voisin_y) and voisin not in self.cases_explorees:
-                    nouveau_cout = self.distances[case_actuelle] + 1  # Coût de déplacement
+                    nouveau_cout = self.distances[case_actuelle] + 1  # Coût du déplacement (g)
 
-                    # Mise à jour si on trouve un meilleur chemin
+                    # Mettre à jour le coût et le chemin si on trouve un meilleur chemin vers ce voisin
                     if voisin not in self.distances or nouveau_cout < self.distances[voisin]:
+                        # Met à jour g (distance depuis le départ)
                         self.distances[voisin] = nouveau_cout
+                        # Enregistre le voisin
                         self.precedents[voisin] = case_actuelle
+                        # Ajoute le voisin à la liste avec f = g + h
                         voisins.append((self.cout_total(voisin), voisin))
 
-            # Trier les voisins en fonction de f = g + h et les ajouter à la file d'attente
+            # Trier les voisins en fonction de f = g + h pour explorer en priorité les plus prometteurs
             voisins.sort()
+
+            # Ajouter les voisins triés à la liste des cases à explorer
             for _, voisin in voisins:
                 self.en_attente.add(voisin)
+
 
     def reconstruire_chemin(self):
         """Reconstruit le chemin optimal."""
@@ -115,10 +130,9 @@ class A_star:
         return chemin[::-1]  # Inversé pour partir du départ
 
     def afficher_bilan(self):
-        print("")
-        print(f"Nombre de cases visitées : {self.nombre_cases_explorees + 1}") # +1 pour ajouter le départ
-        print(f"Taille du chemin final   : {self.taille_chemin_final    + 2}") # +2 pour ajouter le départ et l'arrivée
-        print("")
+        print(f"\nNombre de cases visitées (départ en arrivé compris) : {self.nombre_cases_explorees + 1}") # +1 pour ajouter le départ
+        print(f"Taille du chemin final                              "
+              f": {self.taille_chemin_final    + 2}\n") # +2 pour ajouter le départ et l'arrivée
 
     def afficher_resultat(self):
         """Affiche le plateau avec le chemin et les explorations."""
@@ -154,7 +168,7 @@ class A_star:
 
 # Test
 if __name__ == "__main__":
-    plateau_test = Plateau(5, 5, 0, False)
+    plateau_test = Plateau(10, 10, 0, False)
 
     # Lancer A* avec heuristique Ville
     algo = A_star(plateau_test, heuristique="V")
