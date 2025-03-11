@@ -29,7 +29,7 @@ class ComparaisonAStarDijkstra:
 
             # Nombre d'itérations par défaut
             for _ in range(self.iteration):
-                plateau = Plateau(self.largeur, self.longueur, taux / 100, True)
+                plateau = Plateau(self.largeur, self.longueur, taux / 100, False)
 
                 # Exécution de A* avec heuristique null (Dijkstra)
                 algo_heuristique_null = A_star(plateau, heuristique="N")
