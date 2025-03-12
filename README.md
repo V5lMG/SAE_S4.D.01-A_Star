@@ -4,33 +4,52 @@
 
 **Description**
 
-TODO
+Cette application permet de générer des plateaux avec un taux de case interdite défini pour
+pouvoir executer l'algorithme A* avec l'heuristique choisie.
+
+-----------------------------------------
 
 **Membres de l'équipe et répartition des rôles**
 
 **CAMBON Mathias**
 
 Rôle : Responsable Développement
+
 Email : mathias.cambon@iut-rodez.fr
+
 GitHub : MathiasCambon-1
+
+-----------------------------------------
 
 **MUNIER-GENIE Valentin**
 
 Rôle : Responsable Développement
+
 Email : valentin.munie-genie@iut-rodez.fr
+
 GitHub : V5lMG
+
+-----------------------------------------
 
 **THIERRY Erwan**
 
 Rôle : Responsable Développement
+
 Email : erwan.thierry@iut-rodez.fr
+
 GitHub : thierry-erwan
+
+-----------------------------------------
 
 **XAVIER TABORDA Rodrigo**
 
 Rôle : Responsable Développement
+
 Email : rodrigo.xaviertaborda@iut-rodez.fr
+
 GitHub : XTRodrigo
+
+-----------------------------------------
 
 **Lien vers les ressources**
 
